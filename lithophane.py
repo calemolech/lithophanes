@@ -1,5 +1,5 @@
 import cv2
-from skimage.transform import resize
+# from skimage.transform import resize
 
 
 class ImageMap:
@@ -39,8 +39,6 @@ class ImageMap:
         """
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return gray
-
-
 
     # TODO: 4. Flip image (optional)
     def flip_image(self):
