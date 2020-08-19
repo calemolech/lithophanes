@@ -1,5 +1,6 @@
 import sys
 import cv2
+from PyQt5 import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, QFileDialog
 
@@ -10,41 +11,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from mpl_toolkits.mplot3d import Axes3D
 
 from resources.ui.main_window import *
-from lithophane import ImageMap
+from lithophane import *
 from stl import mesh
 import numpy as np
-
-
-class ThreeDSurfaceGraphWindow(FigureCanvas):  # Class for 3D window
-    def __init__(self):
-        self.plot_colorbar = None
-        self.plot_figure = figure(figsize=(7, 7))
-        FigureCanvas.__init__(self, self.plot_figure)  # creating FigureCanvas
-        self.axes = self.plot_figure.gca(projection='3d')  # generates 3D Axes object
-        self.setWindowTitle("figure")  # sets Window title
-
-    def draw_graph(self, x, y, z):  # Function for graph plotting
-        self.axes.clear()
-        if self.plot_colorbar is not None:  # avoids adding one more colorbar at each draw operation
-            self.plot_colorbar.remove()
-        # plots the 3D surface plot
-        plot_stuff = self.axes.plot_surface(x, y, z,
-                                            cmap=cm.coolwarm, linewidth=0, antialiased=False)
-        self.axes.zaxis.set_major_locator(LinearLocator(10))
-        self.axes.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-        # Add a color bar which maps values to colors.
-        self.plot_colorbar = self.plot_figure.colorbar(plot_stuff, shrink=0.5, aspect=5)
-        # draw plot
-        self.draw()
-
-
-def f(x, y):  # For Generating Z coordinates
-    return np.sin(np.sqrt(x ** 2 + y ** 2))
-
-
-def g(x, y):  # For Generating Z coordinates (alternative)
-    return np.sin(x) + np.cos(y)
-
+import pyvista as pv
+from pyvistaqt import BackgroundPlotter, QtInteractor
+from pyvista import examples
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -63,13 +35,9 @@ class MainWindow(QMainWindow):
         # Render test
         self.ui.renderButton.clicked.connect(self.render_file)
 
-        self.plot_container = ThreeDSurfaceGraphWindow()
-        self.ui.outputLayout.addWidget(self.plot_container)
-        self.plot_status = u'a'
-        self.X_plot_val = None
-        self.Y_plot_val = None
-        self.Z_plot_val = None
-        self.test_std_out()
+        self.frame = Qt.QFrame()
+        self.plotter = QtInteractor(self.frame)
+        self.ui.outputLayout.addWidget(self.plotter.interactor)
 
     def openFile(self):
         options = QFileDialog.Options()
@@ -86,39 +54,25 @@ class MainWindow(QMainWindow):
             self.input_scene.addItem(item)
             self.ui.graphicsViewInput.setScene(self.input_scene)
 
-            # CV2
-            # image2d = ImageMap(file_name)
-            # image = image2d.image
-            # gray = image2d.rgb_to_gray(image)
-            # scaled = image2d.scale_image(gray, 40)
 
-            # cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-            # cv2.imshow('image', scaled)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            image2d = ImageMap(file_name)
+            image = image2d.image
+            x,y,z = image2d.jpg2stl(width=40, h=3, d=0.5, show=False)
+            model = image2d.makemesh(x, y,z )
+            model.save("temp.stl")
+            print("ok")
+            sphere = pv.read("temp.stl")
+            self.plotter.add_mesh(sphere)
 
-    @pyqtSlot()
-    def test_std_out(self):
-        # Make plot data
-        if self.plot_status == u'a':
-            self.X_plot_val = np.arange(-10, 10, 0.25)  # X coordinates
-            self.Y_plot_val = np.arange(-10, 10, 0.25)  # Y coordinates
-            # Forming MeshGrid
-            self.X_plot_val, self.Y_plot_val = np.meshgrid(self.X_plot_val, self.Y_plot_val)
-            self.Z_plot_val = g(self.X_plot_val, self.Y_plot_val)
-            self.plot_status = u'b'
-        else:
-            self.X_plot_val = np.arange(-5, 5, 0.25)  # X coordinates
-            self.Y_plot_val = np.arange(-5, 5, 0.25)  # Y coordinates
-            # Forming MeshGrid
-            self.X_plot_val, self.Y_plot_val = np.meshgrid(self.X_plot_val, self.Y_plot_val)
-            self.Z_plot_val = f(self.X_plot_val, self.Y_plot_val)
-            self.plot_status = u'a'
-        # call plot for tests
-        self.plot_container.draw_graph(self.X_plot_val, self.Y_plot_val, self.Z_plot_val)
+
 
     def render_file(self):
         config = self.get_config();
+
+        sphere = pv.read("/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/out_stl/c.stl")
+        sphere = pv.read("/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/out_stl/a_Cylinder.stl")
+        sphere = pv.read("/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/out_stl/a_Flat.stl")
+        self.plotter.add_mesh(sphere)
 
     def get_config(self):
         shape = self.ui.shapeComboBox.currentData(self.ui.shapeComboBox.currentIndex())
