@@ -47,9 +47,9 @@ class ImageMap:
         return self
 
     # TODO: 5. Convert2D image to CloudPoint
-    def jpg2stl(self, width='', h=3.0, d=0.5, show=True):
-        depth = h
-        offset = d
+    def image2points(self, width='', max_thickness=3.0, min_thickness=0.5, show=True):
+        depth = max_thickness
+        offset = min_thickness
 
         if width == '':
             width = self.image.shape[1]
@@ -85,13 +85,18 @@ class ImageMap:
         z = np.zeros([z_middle.shape[0] + 2, z_middle.shape[1] + 2])
         z[1:-1, 1:-1] = z_middle
 
-        x1 = np.linspace(1, z.shape[1] / 10, z.shape[1])
-        y1 = np.linspace(1, z.shape[0] / 10, z.shape[0])
+        x1 = np.linspace(1, z.shape[1], z.shape[1])
+        y1 = np.linspace(1, z.shape[0], z.shape[0])
 
         x, y = np.meshgrid(x1, y1)
 
         x = np.fliplr(x)
         return x, y, z
+
+    @staticmethod
+    def testmesh(x,y,z):
+        point_cloud = np.dstack((x, y, x))
+        return point_cloud
 
     @staticmethod
     def makemesh(x, y, z):
@@ -144,6 +149,26 @@ class ImageMap:
                 model.vectors[i][j] = points[f[j]]
 
         return model
+
+    @staticmethod
+    def point_cloud(self, depth):
+        """Transform a depth image into a point cloud with one point for each
+        pixel in the image, using the camera transform for a camera
+        centred at cx, cy with field of view fx, fy.
+
+        depth is a 2-D ndarray with shape (rows, cols) containing
+        depths from 1 to 254 inclusive. The result is a 3-D array with
+        shape (rows, cols, 3). Pixels with invalid depth in the input have
+        NaN for the z-coordinate in the result.
+
+        """
+        rows, cols = depth.shape
+        c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
+        valid = (depth > 0) & (depth < 255)
+        z = np.where(valid, depth / 256.0, np.nan)
+        x = np.where(valid, z * (c - self.cx) / self.fx, 0)
+        y = np.where(valid, z * (r - self.cy) / self.fy, 0)
+        return np.dstack((x, y, z))
 
 class Lithophane:
     def __index__(self):
