@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>770</width>
-    <height>617</height>
+    <width>1024</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -127,10 +127,77 @@
        <layout class="QGridLayout" name="settingGridLayout">
         <item row="2" column="0">
          <layout class="QGridLayout" name="gridLayout">
+          <item row="2" column="5">
+           <widget class="QSlider" name="otherSetting2Slider">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="5">
+           <widget class="QSlider" name="otherSetting3Slider">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QDoubleSpinBox" name="minThickDoubleSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>10.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QLabel" name="lblBorderThickness">
+            <property name="text">
+             <string>Border Thickness</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="6">
+           <widget class="QSpinBox" name="otherSetting2SpinBox"/>
+          </item>
+          <item row="0" column="5" colspan="2">
+           <layout class="QHBoxLayout" name="borderHorizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="borderYesRadioButton">
+              <property name="text">
+               <string>Yes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="borderNoRadioButton">
+              <property name="text">
+               <string>No</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="6">
+           <widget class="QSpinBox" name="otherSetting3SpinBox"/>
+          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lblMinThick">
             <property name="text">
-             <string>Thickness</string>
+             <string>Min Thickness</string>
             </property>
            </widget>
           </item>
@@ -155,22 +222,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="6">
-           <widget class="QSpinBox" name="borderThicknessSpinBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>50</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1" colspan="2">
            <widget class="QComboBox" name="shapeComboBox">
             <property name="editable">
@@ -181,7 +232,7 @@
           <item row="1" column="5">
            <widget class="QSlider" name="borderThicknessSlider">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="maximum">
              <number>50</number>
@@ -239,7 +290,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="lblMaxThick">
             <property name="text">
-             <string>Max Thick</string>
+             <string>Max Thicknes</string>
             </property>
            </widget>
           </item>
@@ -257,13 +308,29 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="1">
+           <widget class="QSlider" name="maxThickSlider">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>150</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="QSlider" name="minThickSlider">
             <property name="minimum">
              <number>1</number>
             </property>
             <property name="maximum">
-             <number>50</number>
+             <number>100</number>
             </property>
             <property name="value">
              <number>3</number>
@@ -273,78 +340,38 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QSlider" name="maxThickSlider">
+          <item row="1" column="6">
+           <widget class="QDoubleSpinBox" name="borderThicknessDoubleSpinBox">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QSlider" name="otherSetting2Slider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="5">
-           <widget class="QSlider" name="otherSetting3Slider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QSpinBox" name="minThickSpinBox">
-            <property name="minimum">
+            <property name="decimals">
              <number>1</number>
             </property>
             <property name="maximum">
-             <number>50</number>
+             <double>15.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QSpinBox" name="maxThickspinBox">
-            <property name="enabled">
-             <bool>false</bool>
+           <widget class="QDoubleSpinBox" name="maxThickDoubleSpinBox">
+            <property name="decimals">
+             <number>1</number>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="6">
-           <widget class="QSpinBox" name="otherSetting2SpinBox"/>
-          </item>
-          <item row="3" column="6">
-           <widget class="QSpinBox" name="otherSetting3SpinBox"/>
-          </item>
-          <item row="0" column="5" colspan="2">
-           <layout class="QHBoxLayout" name="borderHorizontalLayout">
-            <item>
-             <widget class="QRadioButton" name="borderYesRadioButton">
-              <property name="text">
-               <string>Yes</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="borderNoRadioButton">
-              <property name="text">
-               <string>No</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="4">
-           <widget class="QLabel" name="lblBorderThickness">
-            <property name="text">
-             <string>Border Thickness</string>
+            <property name="minimum">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>15.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>3.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -361,8 +388,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>770</width>
-     <height>21</height>
+     <width>1024</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -506,70 +533,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>minThickSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>minThickSpinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>179</x>
-     <y>521</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>320</x>
-     <y>521</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxThickSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>maxThickspinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>179</x>
-     <y>559</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>320</x>
-     <y>559</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>maxThickspinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>maxThickSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>320</x>
-     <y>559</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>179</x>
-     <y>559</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>minThickSpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>minThickSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>320</x>
-     <y>521</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>179</x>
-     <y>521</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>sizeSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sizeSlider</receiver>
@@ -650,54 +613,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>borderThicknessSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>borderThicknessSpinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>597</x>
-     <y>483</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>738</x>
-     <y>483</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>borderThicknessSpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>borderThicknessSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>738</x>
-     <y>483</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>597</x>
-     <y>483</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>borderYesRadioButton</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>borderThicknessSpinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>558</x>
-     <y>446</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>738</x>
-     <y>483</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>borderYesRadioButton</sender>
    <signal>clicked(bool)</signal>
    <receiver>borderThicknessSlider</receiver>
@@ -725,22 +640,6 @@
     </hint>
     <hint type="destinationlabel">
      <x>603</x>
-     <y>483</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>borderNoRadioButton</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>borderThicknessSpinBox</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>692</x>
-     <y>446</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>738</x>
      <y>483</y>
     </hint>
    </hints>

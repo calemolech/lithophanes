@@ -14,7 +14,7 @@ from resources.ui.UserWidgets import QDoubleSlider
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1024, 768)
+        MainWindow.resize(770, 617)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
@@ -61,9 +61,9 @@ class Ui_MainWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.buttonOutputLayout.addItem(spacerItem2, 0, 4, 1, 1)
         self.outputLayout.addLayout(self.buttonOutputLayout)
-        # self.graphicsViewOutput = QtWidgets.QGraphicsView(self.centralwidget)
-        # self.graphicsViewOutput.setObjectName("graphicsViewOutput")
-        # self.outputLayout.addWidget(self.graphicsViewOutput)
+        self.graphicsViewOutput = QtWidgets.QGraphicsView(self.centralwidget)
+        self.graphicsViewOutput.setObjectName("graphicsViewOutput")
+        self.outputLayout.addWidget(self.graphicsViewOutput)
         self.visualizeLayout.addLayout(self.outputLayout)
         self.visualizeLayout.setStretch(0, 1)
         self.visualizeLayout.setStretch(2, 1)
@@ -328,6 +328,7 @@ class Ui_MainWindow(object):
                            self.maxThickSlider.minimum(),
                            self.maxThickSlider.maximum())
         self.maxThickDoubleSpinBox.setValue(new_val)
+        print(val, new_val)
         self.maxThickDoubleSpinBox.blockSignals(False)
 
 
@@ -339,6 +340,7 @@ class Ui_MainWindow(object):
                            self.minThickSlider.minimum(),
                            self.minThickSlider.maximum())
         self.minThickDoubleSpinBox.setValue(new_val)
+        print(val, new_val)
         self.minThickDoubleSpinBox.blockSignals(False)
 
 
