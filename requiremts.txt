@@ -1,0 +1,5 @@
+numpy==1.19.1
+opencv-python==4.4.0.40
+opencv-python-headless==4.4.0.40
+PyQt5==5.15.0
+PyQt5-sip==12.8.0
