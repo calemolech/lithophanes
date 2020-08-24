@@ -19,7 +19,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
-     <layout class="QVBoxLayout" name="mainLayout" stretch="7,0,3">
+     <layout class="QVBoxLayout" name="mainLayout" stretch="7,0,0,3">
       <item>
        <layout class="QHBoxLayout" name="visualizeLayout" stretch="1,0,1">
         <item>
@@ -117,6 +117,28 @@
        </layout>
       </item>
       <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="value">
+         <number>24</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
+        <property name="format">
+         <string>%p%</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -128,7 +150,10 @@
         <item row="2" column="0">
          <layout class="QGridLayout" name="gridLayout">
           <item row="2" column="5">
-           <widget class="QSlider" name="otherSetting2Slider">
+           <widget class="QSlider" name="curveSlider">
+            <property name="maximum">
+             <number>360</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -168,7 +193,11 @@
            </widget>
           </item>
           <item row="2" column="6">
-           <widget class="QSpinBox" name="otherSetting2SpinBox"/>
+           <widget class="QSpinBox" name="curveSpinBox">
+            <property name="maximum">
+             <number>360</number>
+            </property>
+           </widget>
           </item>
           <item row="0" column="5" colspan="2">
            <layout class="QHBoxLayout" name="borderHorizontalLayout">
@@ -251,7 +280,10 @@
              <number>1000</number>
             </property>
             <property name="value">
-             <number>100</number>
+             <number>300</number>
+            </property>
+            <property name="sliderPosition">
+             <number>300</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -264,10 +296,10 @@
              <number>1</number>
             </property>
             <property name="maximum">
-             <number>1000</number>
+             <number>500</number>
             </property>
             <property name="value">
-             <number>100</number>
+             <number>300</number>
             </property>
            </widget>
           </item>
@@ -295,7 +327,7 @@
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QLabel" name="lblOtherSetting2">
+           <widget class="QLabel" name="lblCurrve">
             <property name="text">
              <string>Other Setting</string>
             </property>
@@ -549,9 +581,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>otherSetting2Slider</sender>
+   <sender>curveSlider</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>otherSetting2SpinBox</receiver>
+   <receiver>curveSpinBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -565,9 +597,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>otherSetting2SpinBox</sender>
+   <sender>curveSpinBox</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>otherSetting2Slider</receiver>
+   <receiver>curveSlider</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
