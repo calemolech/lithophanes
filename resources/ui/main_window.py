@@ -17,6 +17,7 @@ class UiMainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1024, 768)
+        MainWindow.setMinimumSize(1024, 768)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
@@ -38,6 +39,7 @@ class UiMainWindow(object):
         self.buttonInputLayout.addWidget(self.selectImageButton, 0, 0, 1, 1)
         self.inputLayout.addLayout(self.buttonInputLayout)
         self.graphicsViewInput = QtWidgets.QGraphicsView(self.centralwidget)
+        # self.graphicsViewInput = QtWidgets.QLabel(self.centralwidget)
         self.graphicsViewInput.setObjectName("graphicsViewInput")
         self.inputLayout.addWidget(self.graphicsViewInput)
         self.visualizeLayout.addLayout(self.inputLayout)
@@ -156,12 +158,15 @@ class UiMainWindow(object):
         self.shapeComboBox.setEditable(False)
         self.shapeComboBox.setObjectName("shapeComboBox")
         self.gridLayout.addWidget(self.shapeComboBox, 0, 1, 1, 2)
-        self.borderThicknessSlider = QtWidgets.QSlider(self.centralwidget)
-        self.borderThicknessSlider.setEnabled(True)
-        self.borderThicknessSlider.setMaximum(50)
-        self.borderThicknessSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.borderThicknessSlider.setObjectName("borderThicknessSlider")
-        self.gridLayout.addWidget(self.borderThicknessSlider, 1, 5, 1, 1)
+        self.borderThickSlider = QDoubleSlider()
+        self.borderThickSlider.setEnabled(False)
+        self.borderThickSlider.setMinInt(0)
+        self.borderThickSlider.setMaxInt(100)
+        self.borderThickSlider.setMinimum(0)
+        self.borderThickSlider.setMaximum(10.0)
+        self.borderThickSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.borderThickSlider.setObjectName("borderThickSlider")
+        self.gridLayout.addWidget(self.borderThickSlider, 1, 5, 1, 1)
         self.sizeSlider = QtWidgets.QSlider(self.centralwidget)
         self.sizeSlider.setMinimum(1)
         self.sizeSlider.setMaximum(500)
@@ -209,15 +214,16 @@ class UiMainWindow(object):
         self.minThickSlider.setOrientation(QtCore.Qt.Horizontal)
         self.minThickSlider.setObjectName("minThickSlider")
         self.gridLayout.addWidget(self.minThickSlider, 2, 1, 1, 1)
-        self.borderThicknessDoubleSpinBox = QtWidgets.QDoubleSpinBox(
+        self.borderThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
-        self.borderThicknessDoubleSpinBox.setEnabled(True)
-        self.borderThicknessDoubleSpinBox.setDecimals(1)
-        self.borderThicknessDoubleSpinBox.setMaximum(15.0)
-        self.borderThicknessDoubleSpinBox.setSingleStep(0.1)
-        self.borderThicknessDoubleSpinBox.setObjectName(
-            "borderThicknessDoubleSpinBox")
-        self.gridLayout.addWidget(self.borderThicknessDoubleSpinBox, 1, 6, 1, 1)
+        self.borderThickDoubleSpinBox.setEnabled(False)
+        self.borderThickDoubleSpinBox.setDecimals(1)
+        self.borderThickDoubleSpinBox.setMinimum(0.0)
+        self.borderThickDoubleSpinBox.setMaximum(10.0)
+        self.borderThickDoubleSpinBox.setSingleStep(0.1)
+        self.borderThickDoubleSpinBox.setObjectName(
+            "borderThickDoubleSpinBox")
+        self.gridLayout.addWidget(self.borderThickDoubleSpinBox, 1, 6, 1, 1)
         self.maxThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
         self.maxThickDoubleSpinBox.setDecimals(1)
@@ -305,15 +311,22 @@ class UiMainWindow(object):
         self.otherSetting3Slider.valueChanged['int'].connect(
             self.otherSetting3SpinBox.setValue)
         self.borderYesRadioButton.clicked['bool'].connect(
-            self.borderThicknessSlider.setEnabled)
+            self.borderThickSlider.setEnabled)
+        self.borderYesRadioButton.clicked['bool'].connect(
+            self.borderThickDoubleSpinBox.setEnabled)
         self.borderNoRadioButton.clicked['bool'].connect(
-            self.borderThicknessSlider.setDisabled)
+            self.borderThickSlider.setDisabled)
+        self.borderNoRadioButton.clicked['bool'].connect(
+            self.borderThickDoubleSpinBox.setDisabled)
         self.maxThickDoubleSpinBox.valueChanged['double'].connect(
             self.maxThickSlider.setValue)
         self.minThickDoubleSpinBox.valueChanged['double'].connect(
             self.minThickSlider.setValue)
+        self.borderThickDoubleSpinBox.valueChanged['double'].connect(
+            self.borderThickSlider.setValue)
         self.maxThickSlider.valueChanged.connect(self.handleMaxThickSlider)
         self.minThickSlider.valueChanged.connect(self.handleMinThickSlider)
+        self.borderThickSlider.valueChanged.connect(self.handleBorderThickSlider)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -387,6 +400,15 @@ class UiMainWindow(object):
         self.minThickDoubleSpinBox.setValue(new_val)
         self.minThickDoubleSpinBox.blockSignals(False)
 
+    def handleBorderThickSlider(self, val):
+        self.borderThickDoubleSpinBox.blockSignals(True)
+        new_val = self.fit(val,
+                           self.borderThickSlider.getMinInt(),
+                           self.borderThickSlider.getMaxInt(),
+                           self.borderThickSlider.minimum(),
+                           self.borderThickSlider.maximum())
+        self.borderThickDoubleSpinBox.setValue(new_val)
+        self.borderThickDoubleSpinBox.blockSignals(False)
 
 if __name__ == "__main__":
     import sys
