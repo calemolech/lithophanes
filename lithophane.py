@@ -95,9 +95,10 @@ class ImageMap:
         return x, y, z
 
     @staticmethod
-    def makemesh(x, y, z):
+    def make_mesh(x, y, z):
         '''Convert point cloud grid to mesh'''
         count = 0
+        triangles_count =0
         points = []
         triangles = []
         import time
@@ -106,19 +107,20 @@ class ImageMap:
             for j in range(z.shape[1] - 1):
                 # Triangle 1
                 points.append([x[i][j], y[i][j], z[i][j]])
-                points.append([x[i][j + 1], y[i][j + 1], z[i][j + 1]])
+                points.append([x[i][j+1], y[i][j+1], z[i][j+1]])
                 points.append([x[i + 1][j], y[i + 1][j], z[i + 1][j]])
 
-                triangles.append([count, count + 1, count + 2])
+                # triangles.append([count, count + 1, count + 2])
 
                 # Triangle 2
                 points.append([x[i][j + 1], y[i][j + 1], z[i][j + 1]])
                 points.append([x[i + 1][j + 1], y[i + 1][j + 1], z[i + 1][j + 1]])
                 points.append([x[i + 1][j], y[i + 1][j], z[i + 1][j]])
 
-                triangles.append([count + 3, count + 4, count + 5])
+                # triangles.append([count + 3, count + 4, count + 5])
+                # count += 6
 
-                count += 6
+                triangles_count +=2
 
         # BACK
         t2 = time.time()
@@ -130,26 +132,85 @@ class ImageMap:
             points.append([x[0][j + 1], y[0][j + 1], z[0][j + 1]])
             points.append([x[0][j], y[0][j], z[0][j]])
 
-            triangles.append([count, count + 1, count + 2])
+            # triangles.append([count, count + 1, count + 2])
 
             # Triangle 2
             points.append([x[bot][j], y[bot][j], z[bot][j]])
             points.append([x[bot][j + 1], y[bot][j + 1], z[bot][j + 1]])
             points.append([x[0][j + 1], y[0][j + 1], z[0][j + 1]])
 
-            triangles.append([count + 3, count + 4, count + 5])
-
-            count += 6
+            # triangles.append([count + 3, count + 4, count + 5])
+            # count += 6
+            
+            triangles_count += 2
 
         # Create the mesh
         t3 = time.time()
-        model = mesh.Mesh(np.zeros(len(triangles), dtype=mesh.Mesh.dtype))
-        for i, f in enumerate(triangles):
+        model = mesh.Mesh(np.zeros(triangles_count, dtype=mesh.Mesh.dtype))
+        # for i, f in enumerate(triangles):
+        #     for j in range(3):
+        #         model.vectors[i][j] = points[f[j]]
+
+        for i in range(triangles_count):
             for j in range(3):
-                model.vectors[i][j] = points[f[j]]
+                model.vectors[i][j] = points[i * 3 + j]
+
+
         t4 = time.time()
 
         print(t2 - t1, t3 - t2, t4 - t3, t4 - t1)
+
+        return model
+
+    @staticmethod
+    def make_mesh_speed(x, y, z):
+        '''Convert point cloud grid to mesh'''
+
+        import time
+
+        count = 0
+        width = z.shape[0] - 1
+        height = z.shape[1] - 1
+        triangles_count = width*height*2 + height*2
+        t1 = time.time()
+        model = mesh.Mesh(np.zeros(triangles_count, dtype=mesh.Mesh.dtype))
+
+        for i in range(z.shape[0] - 1):
+            for j in range(z.shape[1] - 1):
+                # Triangle 1
+                model.vectors[count] = np.array([
+                    [x[i][j], y[i][j], z[i][j]],
+                    [x[i][j + 1], y[i][j + 1], z[i][j + 1]],
+                    [x[i + 1][j], y[i + 1][j], z[i + 1][j]]])
+
+                # Triangle 2
+                model.vectors[count+1] = np.array([
+                    [x[i][j + 1], y[i][j + 1], z[i][j + 1]],
+                    [x[i + 1][j + 1], y[i + 1][j + 1], z[i + 1][j + 1]],
+                    [x[i + 1][j], y[i + 1][j], z[i + 1][j]]])
+
+                count+=2
+
+        # BACK
+        t2 = time.time()
+        for j in range(x.shape[1] - 1):
+            bot = x.shape[0] - 1
+
+            model.vectors[count] = np.array([
+                [x[bot][j], y[bot][j], z[bot][j]],
+                [x[0][j + 1], y[0][j + 1], z[0][j + 1]],
+                [x[0][j], y[0][j], z[0][j]]])
+
+            model.vectors[count+1] = np.array([
+                [x[bot][j], y[bot][j], z[bot][j]],
+                [x[bot][j + 1], y[bot][j + 1], z[bot][j + 1]],
+                [x[0][j + 1], y[0][j + 1], z[0][j + 1]]])
+
+            count += 2
+
+        t3 = time.time()
+
+        print(t2 - t1, t3 - t2, t3 - t1)
 
         return model
 
@@ -175,7 +236,7 @@ class ImageMap:
     #     return x,y,z
 
     @staticmethod
-    def makeCylinder(x, y, z):
+    def make_cylinder(x, y, z):
         '''Convert flat point cloud to Cylinder'''
         newx = x.copy()
         newz = z.copy()
@@ -190,13 +251,13 @@ class ImageMap:
         return newx, y.copy(), newz
 
     @staticmethod
-    def makeCylinder2(x, y, z, curve, shape):
+    def make_cylinder2(x, y, z, curve, shape):
         newx = x.copy()
         newz = z.copy()
 
         # If type = cylinder , overlap offset =1
         if shape == 'Cylinder':
-            overlap_offset = 1
+            overlap_offset = 2
         else:
             overlap_offset = 0
 
