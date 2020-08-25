@@ -7,6 +7,8 @@ import sys
 from config import Config
 from lithophane import *
 from resources.ui.main_window import *
+from stl import Mode
+import copy
 
 
 class MainWindow(QMainWindow):
@@ -15,55 +17,55 @@ class MainWindow(QMainWindow):
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
 
-        # Config menubar
+        # Menubar trigger
         self.ui.actionOpen.triggered.connect(self.open_file)
         self.ui.actionExit.triggered.connect(app.quit)
 
-        # Config trigger function
+        # Button trigger
         self.ui.shapeComboBox.currentTextChanged.connect(
             self.update_config_by_shape)
-
-        self.ui.shapeComboBox.addItems(["Flat", "Cylinder", "Curve", "Heart"])
-
-        self.config = Config()
-
-        # Image Default
-        self.input_scene = QGraphicsScene(self)
-        self.output_scene = QGraphicsScene(self)
-
-        # Open File
         self.ui.selectImageButton.clicked.connect(self.open_file)
-
-        # Render test
         self.ui.renderButton.clicked.connect(self.render_file)
 
+        # Init default for UI
+        self.ui.shapeComboBox.addItems(["Flat", "Cylinder", "Curve", "Heart"])
+        self.ui.graphicsViewInput.resizeEvent = self.update_input_size
+        self.ui.graphicsViewInput.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOff)
+        self.ui.graphicsViewInput.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarAlwaysOff)
+        self.ui.graphicsViewInput.setMinimumSize(300, 300)
+        self.input_scene = QGraphicsScene(self)
+        self.pixmap = None
+
+        # Load default config
+        self.config = Config()
+
+        # Init output view
         self.frame = Qt.QFrame()
         self.plotter = QtInteractor(self.frame)
         self.ui.outputLayout.addWidget(self.plotter.interactor)
-
-    def init_new_plotter(self):
-        self.ui.outputLayout.removeWidget(self.plotter.interactor)
-        self.plotter = QtInteractor(self.frame)
-        self.ui.outputLayout.addWidget(self.plotter.interactor)
+        self.plotter.show_axes_all()
         # self.plotter.show_grid()
         # self.plotter.enable_zoom_style()
-        self.plotter.show_axes_all()
         # self.plotter.view_xy()
 
     def open_file(self):
-        file_name,_ = QFileDialog.getOpenFileName(self, "Open Image",
-                                                   QtCore.QDir.currentPath(),
-                                                   "Images (*.png *.jpg)")
-        # file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
+        # file_name, _ = QFileDialog.getOpenFileName(self, "Open Image",
+        #                                            QtCore.QDir.currentPath(),
+        #                                            "Images (*.png *.jpg)")
+        file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
         if file_name:
             # Qt Graphics
             self.ui.lineImagePath.setText(file_name)
             self.input_scene.clear()
-            pixmap = QtGui.QPixmap(file_name)
-            pixmap = pixmap.scaled(0.95 * self.ui.graphicsViewInput.size(), QtCore.Qt.KeepAspectRatio)
-            item = QGraphicsPixmapItem(pixmap)
-            self.input_scene.addItem(item)
+            self.pixmap = QtGui.QPixmap(file_name)
+            pixmap = self.pixmap
+            pixmap = pixmap.scaled(self.ui.graphicsViewInput.size(),
+                                   QtCore.Qt.KeepAspectRatio)
+            self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
             self.ui.graphicsViewInput.setScene(self.input_scene)
+
 
             self.image2d = ImageMap(file_name)
 
@@ -74,18 +76,22 @@ class MainWindow(QMainWindow):
                                             self.config.max_thickness,
                                             self.config.min_thickness)
         # x2,y2,z2 = image2d.makeCylinder(x, y, z)
-        x2, y2, z2 = self.image2d.makeCylinder2(x, y, z,
-                                                self.ui.curveSpinBox.value(),
-                                                self.ui.shapeComboBox.currentText())
-        model = self.image2d.makemesh(x2, y2, z2)
-        model.save("temp.stl")
-        print("ok")
+        x2, y2, z2 = self.image2d.make_cylinder2(x, y, z,
+                                                 self.ui.curveSpinBox.value(),
+                                                 self.ui.shapeComboBox.currentText())
+        # model = self.image2d.make_mesh(x2, y2, z2)
+        model = self.image2d.make_mesh_speed(x2, y2, z2)
+        print("render ok")
+
+        # sphere = pv.StructuredGrid(x2,y2,z2)
+
+        import time
+        t1 = time.time()
+        model.save(filename="temp.stl", mode=Mode.BINARY)
         sphere = pv.read("temp.stl")
-        sphere = pv.StructuredGrid(x2, y2, z2)
+        print(time.time() - t1)
 
-
-
-        self.init_new_plotter()
+        self.plotter.clear()
         self.plotter.add_mesh(sphere)
         self.plotter.camera_position = [(0, 0, z.shape[1] * 3.5),
                                         sphere.center, (0, 1, 0)]
@@ -113,6 +119,17 @@ class MainWindow(QMainWindow):
             self.ui.curveSlider.setDisabled(True)
         elif shape == 'Cylinder':
             self.ui.curveSpinBox.setValue(360)
+
+    def update_input_size(self, event):
+        if self.pixmap is not None:
+            pixmap = self.pixmap
+            pixmap = pixmap.scaled(self.ui.graphicsViewInput.size(),
+                                   QtCore.Qt.KeepAspectRatio,
+                                   QtCore.Qt.SmoothTransformation)
+            self.input_scene.clear()
+            self.input_scene.setSceneRect(self.ui.graphicsViewInput.sceneRect())
+            self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
