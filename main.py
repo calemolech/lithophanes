@@ -1,14 +1,14 @@
 import pyvista as pv
 from PyQt5 import Qt, QtGui
-from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QFileDialog, \
-    QGraphicsPixmapItem
+from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
+    QMessageBox
 from pyvistaqt import QtInteractor
 import sys
 from config import Config
 from lithophane import *
 from resources.ui.main_window import *
 from stl import Mode
-import copy
+import time
 
 
 class MainWindow(QMainWindow):
@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
+        self.image2d = None
 
         # Menubar trigger
         self.ui.actionOpen.triggered.connect(self.open_file)
@@ -51,10 +52,10 @@ class MainWindow(QMainWindow):
         # self.plotter.view_xy()
 
     def open_file(self):
-        # file_name, _ = QFileDialog.getOpenFileName(self, "Open Image",
-        #                                            QtCore.QDir.currentPath(),
-        #                                            "Images (*.png *.jpg)")
-        file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open Image",
+                                                   QtCore.QDir.currentPath(),
+                                                   "Images (*.png *.jpg)")
+        # file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
         if file_name:
             # Qt Graphics
             self.ui.lineImagePath.setText(file_name)
@@ -66,35 +67,42 @@ class MainWindow(QMainWindow):
             self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
             self.ui.graphicsViewInput.setScene(self.input_scene)
 
-
             self.image2d = ImageMap(file_name)
 
     def render_file(self):
-        self.config = self.get_ui_config()
+        if self.image2d is None or self.ui.lineImagePath.text() == "":
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Please select image before render!")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setWindowFlag(QtCore.Qt.Drawer)
+            retval = msg.exec_()
+            return
+        else:
+            self.config = self.get_ui_config()
+            t1 = time.time()
+            x, y, z = self.image2d.image2points(self.config.size,
+                                                self.config.max_thickness,
+                                                self.config.min_thickness)
 
-        x, y, z = self.image2d.image2points(self.config.size,
-                                            self.config.max_thickness,
-                                            self.config.min_thickness)
-        # x2,y2,z2 = image2d.makeCylinder(x, y, z)
-        x2, y2, z2 = self.image2d.make_cylinder2(x, y, z,
-                                                 self.ui.curveSpinBox.value(),
-                                                 self.ui.shapeComboBox.currentText())
-        # model = self.image2d.make_mesh(x2, y2, z2)
-        model = self.image2d.make_mesh_speed(x2, y2, z2)
-        print("render ok")
+            x2, y2, z2 = self.image2d.make_shape(x, y, z, self.config.curve,
+                                                 self.config.shape)
+            t2 = time.time()
 
-        # sphere = pv.StructuredGrid(x2,y2,z2)
+            model = self.image2d.make_mesh(x2, y2, z2)
+            t3 = time.time()
 
-        import time
-        t1 = time.time()
-        model.save(filename="temp.stl", mode=Mode.BINARY)
-        sphere = pv.read("temp.stl")
-        print(time.time() - t1)
+            model.save(filename="temp.stl", mode=Mode.BINARY)
+            sphere = pv.read("temp.stl")
+            self.plotter.clear()
+            sphere["Elevation"] = model.vectors[:, :, 2][:, 1].ravel(order="F")
+            self.plotter.add_mesh(sphere)
+            self.plotter.camera_position = [(0, 0, z.shape[1] * 3.5),
+                                            sphere.center, (0, 1, 0)]
+            t4 = time.time()
 
-        self.plotter.clear()
-        self.plotter.add_mesh(sphere)
-        self.plotter.camera_position = [(0, 0, z.shape[1] * 3.5),
-                                        sphere.center, (0, 1, 0)]
+            print("Point cloud: \t%s \nMake mesh:  \t%s \nSave Load:  \t%s "
+                  "\nTotal time: \t%s" % (t2 - t1, t3 - t2, t4 - t3, t4 - t1))
 
     def get_ui_config(self):
         shape_index = self.ui.shapeComboBox.currentIndex()
@@ -107,7 +115,7 @@ class MainWindow(QMainWindow):
             max_thick=self.ui.maxThickDoubleSpinBox.value(),
             curve=self.ui.curveSpinBox.value(),
             use_border=use_border,
-            border_thick=self.ui.borderThicknessSlider.value()
+            border_thick=self.ui.borderThickSlider.value()
         )
         return current_config
 
