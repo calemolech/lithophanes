@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from stl import mesh
 
+
 class ImageMap:
     def __init__(self, image_path, positive=True, mirror=False, flip=False):
         self.image = cv2.imread(image_path)
@@ -10,7 +11,7 @@ class ImageMap:
         self.mirror = mirror
         self.flip = flip
 
-
+    @staticmethod
     def process_image(self):
         return 1
 
@@ -18,7 +19,7 @@ class ImageMap:
 
     # TODO: 2. Scale image
     @staticmethod
-    def scale_image(image, width_mm=40):
+    def scale_image(image, width_mm=400):
         """Scale image to 0.1 pixel width
 
         Will make an image with 1000 pixels wide.
@@ -26,7 +27,7 @@ class ImageMap:
         """
         height = image.shape[0]
         width = image.shape[1]
-        scale = (width_mm * 10 / width)
+        scale = (width_mm / width)
         new_size = (int(width * scale), int(height * scale))
         output = cv2.resize(image, new_size, interpolation=cv2.INTER_CUBIC)
         return output
@@ -47,7 +48,7 @@ class ImageMap:
         return self
 
     # TODO: 5. Convert2D image to CloudPoint
-    def image2points(self, width='', max_thickness=3.0, min_thickness=0.5, show=True):
+    def image2points(self, width='', max_thickness=3.0, min_thickness=0.5):
         depth = max_thickness
         offset = min_thickness
 
@@ -66,11 +67,11 @@ class ImageMap:
         self.gray = self.gray / 255.0
 
         # g = np.fliplr(g)
-        if (show):
-            cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-            cv2.imshow('image', self.gray)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+        # if (show):
+        #     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
+        #     cv2.imshow('image', self.gray)
+        #     cv2.waitKey(0)
+        #     cv2.destroyAllWindows()
 
         # print(np.max(g))
         # print(g.shape)
@@ -79,7 +80,7 @@ class ImageMap:
         ngray = 1 - np.double(self.gray)
 
         # scale z matrix to desired max depth and add base height
-        z_middle = ngray * depth + offset
+        z_middle = ngray * (depth - offset) + offset
 
         # add border of zeros to help with back.
         z = np.zeros([z_middle.shape[0] + 2, z_middle.shape[1] + 2])
@@ -90,88 +91,118 @@ class ImageMap:
 
         x, y = np.meshgrid(x1, y1)
 
-        x = np.fliplr(x)
+        # x = np.fliplr(x)
+        y = np.flipud(y)
         return x, y, z
 
     @staticmethod
-    def testmesh(x,y,z):
-        point_cloud = np.dstack((x, y, x))
-        return point_cloud
-
-    @staticmethod
-    def makemesh(x, y, z):
-        '''Convert point cloud grid to mesh'''
+    def make_mesh(x, y, z):
+        """ Convert point cloud grid to mesh """
         count = 0
-        points = []
-        triangles = []
+        width = z.shape[0] - 1
+        height = z.shape[1] - 1
+        triangles_count = width * height * 2 + height * 2
+        model = mesh.Mesh(np.zeros(triangles_count, dtype=mesh.Mesh.dtype))
+
         for i in range(z.shape[0] - 1):
             for j in range(z.shape[1] - 1):
                 # Triangle 1
-                points.append([x[i][j], y[i][j], z[i][j]])
-                points.append([x[i][j + 1], y[i][j + 1], z[i][j + 1]])
-                points.append([x[i + 1][j], y[i + 1][j], z[i + 1][j]])
-
-                triangles.append([count, count + 1, count + 2])
+                model.vectors[count] = np.array([
+                    [x[i][j], y[i][j], z[i][j]],
+                    [x[i][j + 1], y[i][j + 1], z[i][j + 1]],
+                    [x[i + 1][j], y[i + 1][j], z[i + 1][j]]])
 
                 # Triangle 2
-                points.append([x[i][j + 1], y[i][j + 1], z[i][j + 1]])
-                points.append([x[i + 1][j + 1], y[i + 1][j + 1], z[i + 1][j + 1]])
-                points.append([x[i + 1][j], y[i + 1][j], z[i + 1][j]])
+                model.vectors[count + 1] = np.array([
+                    [x[i][j + 1], y[i][j + 1], z[i][j + 1]],
+                    [x[i + 1][j + 1], y[i + 1][j + 1], z[i + 1][j + 1]],
+                    [x[i + 1][j], y[i + 1][j], z[i + 1][j]]])
 
-                triangles.append([count + 3, count + 4, count + 5])
-
-                count += 6
+                count += 2
 
         # BACK
         for j in range(x.shape[1] - 1):
             bot = x.shape[0] - 1
 
-            # Back Triangle 1
-            points.append([x[bot][j], y[bot][j], z[bot][j]])
-            points.append([x[0][j + 1], y[0][j + 1], z[0][j + 1]])
-            points.append([x[0][j], y[0][j], z[0][j]])
+            model.vectors[count] = np.array([
+                [x[bot][j], y[bot][j], z[bot][j]],
+                [x[0][j + 1], y[0][j + 1], z[0][j + 1]],
+                [x[0][j], y[0][j], z[0][j]]])
 
-            triangles.append([count, count + 1, count + 2])
+            model.vectors[count + 1] = np.array([
+                [x[bot][j], y[bot][j], z[bot][j]],
+                [x[bot][j + 1], y[bot][j + 1], z[bot][j + 1]],
+                [x[0][j + 1], y[0][j + 1], z[0][j + 1]]])
 
-            # Triangle 2
-            points.append([x[bot][j], y[bot][j], z[bot][j]])
-            points.append([x[bot][j + 1], y[bot][j + 1], z[bot][j + 1]])
-            points.append([x[0][j + 1], y[0][j + 1], z[0][j + 1]])
-
-            triangles.append([count + 3, count + 4, count + 5])
-
-            count += 6
-
-        # Create the mesh
-        model = mesh.Mesh(np.zeros(len(triangles), dtype=mesh.Mesh.dtype))
-        for i, f in enumerate(triangles):
-            for j in range(3):
-                model.vectors[i][j] = points[f[j]]
-
+            count += 2
         return model
 
     @staticmethod
-    def point_cloud(self, depth):
-        """Transform a depth image into a point cloud with one point for each
-        pixel in the image, using the camera transform for a camera
-        centred at cx, cy with field of view fx, fy.
+    def make_shape(x, y, z, curve, shape):
+        newx = x.copy()
+        newz = z.copy()
 
-        depth is a 2-D ndarray with shape (rows, cols) containing
-        depths from 1 to 254 inclusive. The result is a 3-D array with
-        shape (rows, cols, 3). Pixels with invalid depth in the input have
-        NaN for the z-coordinate in the result.
+        # If type = cylinder , overlap offset =1
+        if shape == 'Cylinder':
+            overlap_offset = 2
+        else:
+            overlap_offset = 0
 
-        """
-        rows, cols = depth.shape
-        c, r = np.meshgrid(np.arange(cols), np.arange(rows), sparse=True)
-        valid = (depth > 0) & (depth < 255)
-        z = np.where(valid, depth / 256.0, np.nan)
-        x = np.where(valid, z * (c - self.cx) / self.fx, 0)
-        y = np.where(valid, z * (r - self.cy) / self.fy, 0)
-        return np.dstack((x, y, z))
+        width = x.shape[1]
+        height = x.shape[0]
+
+        if curve == 0:
+            return x, y, z
+        if curve != 0:
+            deg2Rad = (np.pi / 180)
+            angle = abs(curve)
+            arc_radius = (width / curve) * (180 / np.pi)
+            y_arc_radius = (height / curve) * (180 / np.pi)
+            distance_from_flat = np.sin(angle * (360 / np.pi)) * arc_radius
+            if (angle >= 180):
+                distance_from_flat = 0
+            start_angle = (0 - angle / 2)
+
+            if (curve < 0):
+                distance_from_flat = 0 - distance_from_flat
+
+        for i in range(0, height):
+            for j in range(0, width):
+                jpos = j
+                ipos = i
+
+                # if j == 1:
+                #     jpos -= 1
+                # elif j == (width - 1):
+                #     jpos += 1
+                # if i == 1:
+                #     ipos -= 1
+                # elif i == (height - 1):
+                #     ipos += 1
+
+                degrees_rotated = start_angle + (
+                        jpos / (width - overlap_offset) * angle)
+                rotation = degrees_rotated * deg2Rad
+                magnitude = arc_radius + z[i, j]
+
+                # Cylinder, Curve
+                if shape in ['Cylinder', 'Curve']:
+                    newx[i, j] = width / 2 + magnitude * np.cos(rotation)
+                    newz[i, j] = distance_from_flat + magnitude * np.sin(
+                        rotation)
+
+                # Heart
+                if shape == 'Heart':
+                    newx[i, j] = width / 2 + magnitude * ((16 * np.sin(
+                        rotation) * np.sin(rotation) * np.sin(rotation)) / 16)
+
+                    newz[i, j] = distance_from_flat + magnitude * ((13 * np.cos(
+                        rotation) - 5 * np.cos(2 * rotation) - 2 * np.cos(
+                        3 * rotation) - np.cos(4 * rotation)) / 16)
+
+        return newz, y.copy(), newx
+
 
 class Lithophane:
     def __index__(self):
         self.thickness = 1
-
-
