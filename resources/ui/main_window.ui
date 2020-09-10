@@ -159,13 +159,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="5">
-           <widget class="QSlider" name="otherSetting3Slider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="minThickDoubleSpinBox">
             <property name="decimals">
@@ -220,8 +213,26 @@
             </item>
            </layout>
           </item>
-          <item row="3" column="6">
-           <widget class="QSpinBox" name="otherSetting3SpinBox"/>
+          <item row="3" column="5" colspan="2">
+           <layout class="QHBoxLayout" name="formatHorizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="binaryFormatRadioButton">
+              <property name="text">
+               <string>Binary</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="asciiFormatRadioButton">
+              <property name="text">
+               <string>Ascii</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lblMinThick">
@@ -334,9 +345,9 @@
            </widget>
           </item>
           <item row="3" column="4">
-           <widget class="QLabel" name="lblOtherSetting3">
+           <widget class="QLabel" name="lblFormat">
             <property name="text">
-             <string>Other Setting</string>
+             <string>STL Format</string>
             </property>
            </widget>
           </item>
@@ -609,70 +620,6 @@
     <hint type="destinationlabel">
      <x>597</x>
      <y>521</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>otherSetting3SpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>otherSetting3Slider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>738</x>
-     <y>559</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>597</x>
-     <y>559</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>otherSetting3Slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>otherSetting3SpinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>597</x>
-     <y>559</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>738</x>
-     <y>559</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>borderYesRadioButton</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>borderThicknessSlider</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>558</x>
-     <y>446</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>603</x>
-     <y>483</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>borderNoRadioButton</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>borderThicknessSlider</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>692</x>
-     <y>446</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>603</x>
-     <y>483</y>
     </hint>
    </hints>
   </connection>

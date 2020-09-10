@@ -107,10 +107,6 @@ class UiMainWindow(object):
         self.curveSlider.setMaximum(360)
         self.curveSlider.setProperty("value", 0)
         self.gridLayout.addWidget(self.curveSlider, 2, 5, 1, 1)
-        self.otherSetting3Slider = QtWidgets.QSlider(self.centralwidget)
-        self.otherSetting3Slider.setOrientation(QtCore.Qt.Horizontal)
-        self.otherSetting3Slider.setObjectName("otherSetting3Slider")
-        self.gridLayout.addWidget(self.otherSetting3Slider, 3, 5, 1, 1)
         self.minThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
         self.minThickDoubleSpinBox.setDecimals(1)
@@ -139,9 +135,18 @@ class UiMainWindow(object):
         self.borderNoRadioButton.setObjectName("borderNoRadioButton")
         self.borderHorizontalLayout.addWidget(self.borderNoRadioButton)
         self.gridLayout.addLayout(self.borderHorizontalLayout, 0, 5, 1, 2)
-        self.otherSetting3SpinBox = QtWidgets.QSpinBox(self.centralwidget)
-        self.otherSetting3SpinBox.setObjectName("otherSetting3SpinBox")
-        self.gridLayout.addWidget(self.otherSetting3SpinBox, 3, 6, 1, 1)
+
+        self.formatHorizontalLayout = QtWidgets.QHBoxLayout()
+        self.formatHorizontalLayout.setObjectName("formatHorizontalLayout")
+        self.binaryRadioButton = QtWidgets.QRadioButton(self.centralwidget)
+        self.binaryRadioButton.setChecked(True)
+        self.binaryRadioButton.setObjectName("binaryRadioButton")
+        self.formatHorizontalLayout.addWidget(self.binaryRadioButton)
+        self.asciiRadioButton = QtWidgets.QRadioButton(self.centralwidget)
+        self.asciiRadioButton.setObjectName("asciiRadioButton")
+        self.formatHorizontalLayout.addWidget(self.asciiRadioButton)
+        self.gridLayout.addLayout(self.formatHorizontalLayout, 3, 5, 1, 2)
+
         self.lblMinThick = QtWidgets.QLabel(self.centralwidget)
         self.lblMinThick.setObjectName("lblMinThick")
         self.gridLayout.addWidget(self.lblMinThick, 2, 0, 1, 1)
@@ -154,6 +159,7 @@ class UiMainWindow(object):
         self.lblBorder = QtWidgets.QLabel(self.centralwidget)
         self.lblBorder.setObjectName("lblBorder")
         self.gridLayout.addWidget(self.lblBorder, 0, 4, 1, 1)
+
         self.shapeComboBox = QtWidgets.QComboBox(self.centralwidget)
         self.shapeComboBox.setEditable(False)
         self.shapeComboBox.setObjectName("shapeComboBox")
@@ -190,6 +196,9 @@ class UiMainWindow(object):
         self.lblCurve = QtWidgets.QLabel(self.centralwidget)
         self.lblCurve.setObjectName("lblCurve")
         self.gridLayout.addWidget(self.lblCurve, 2, 4, 1, 1)
+        self.lblFormat = QtWidgets.QLabel(self.centralwidget)
+        self.lblFormat.setObjectName("STL Format")
+        self.gridLayout.addWidget(self.lblFormat, 3, 4, 1, 1)
         self.lblOtherSetting3 = QtWidgets.QLabel(self.centralwidget)
         self.lblOtherSetting3.setObjectName("lblOtherSetting3")
         self.gridLayout.addWidget(self.lblOtherSetting3, 3, 4, 1, 1)
@@ -306,10 +315,6 @@ class UiMainWindow(object):
         self.sizeSpinBox.valueChanged['int'].connect(self.sizeSlider.setValue)
         self.curveSlider.valueChanged['int'].connect(self.curveSpinBox.setValue)
         self.curveSpinBox.valueChanged['int'].connect(self.curveSlider.setValue)
-        self.otherSetting3SpinBox.valueChanged['int'].connect(
-            self.otherSetting3Slider.setValue)
-        self.otherSetting3Slider.valueChanged['int'].connect(
-            self.otherSetting3SpinBox.setValue)
         self.borderYesRadioButton.clicked['bool'].connect(
             self.borderThickSlider.setEnabled)
         self.borderYesRadioButton.clicked['bool'].connect(
@@ -339,13 +344,15 @@ class UiMainWindow(object):
             _translate("MainWindow", "Border Thickness"))
         self.borderYesRadioButton.setText(_translate("MainWindow", "Yes"))
         self.borderNoRadioButton.setText(_translate("MainWindow", "No"))
+        self.binaryRadioButton.setText(_translate("MainWindow", "Binary"))
+        self.asciiRadioButton.setText(_translate("MainWindow", "ASCII"))
         self.lblMinThick.setText(_translate("MainWindow", "Min Thickness"))
         self.lblShape.setText(_translate("MainWindow", "Shape"))
         self.lblSize.setText(_translate("MainWindow", "Size"))
         self.lblBorder.setText(_translate("MainWindow", "Border"))
         self.lblMaxThick.setText(_translate("MainWindow", "Max Thicknes"))
         self.lblCurve.setText(_translate("MainWindow", "Curve"))
-        self.lblOtherSetting3.setText(_translate("MainWindow", "Other Setting"))
+        self.lblFormat.setText(_translate("MainWindow", "STL Format"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.menuDownload_Settings.setTitle(

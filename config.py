@@ -7,7 +7,8 @@ class Config:
                  min_thick=const.MINIMUM_THICKNESS,
                  use_border=const.DEFAULT_BORDER,
                  border_thick=const.DEFAULT_BORDER_THICKNESS,
-                 curve=const.DEFAULT_CURVE):
+                 curve=const.DEFAULT_CURVE,
+                 format=const.DEFAULT_FORMAT):
         self.shape = shape
         self.size = size
         self.max_thickness = max_thick
@@ -15,6 +16,7 @@ class Config:
         self.use_border = use_border
         self.border_thickness = border_thick
         self.curve = curve
+        self.format = format
 
     def get_config(self, shape_type):
         return self

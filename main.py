@@ -1,7 +1,7 @@
 import pyvista as pv
 from PyQt5 import Qt, QtGui
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
-    QMessageBox
+    QMessageBox, QFileDialog, QDialog
 from pyvistaqt import QtInteractor
 import sys
 from config import Config
@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
             self.update_config_by_shape)
         self.ui.selectImageButton.clicked.connect(self.open_file)
         self.ui.renderButton.clicked.connect(self.render_file)
+        self.ui.downloadButton.clicked.connect(self.download_file)
 
         # Init default for UI
         self.ui.shapeComboBox.addItems(["Flat", "Cylinder", "Curve", "Heart"])
@@ -38,6 +39,22 @@ class MainWindow(QMainWindow):
         self.ui.graphicsViewInput.setMinimumSize(300, 300)
         self.input_scene = QGraphicsScene(self)
         self.pixmap = None
+
+        # Init Dialogs
+        self.load_dialog = QFileDialog()
+        self.load_dialog.setFilter(self.load_dialog.filter())
+        self.load_dialog.setAcceptMode(QFileDialog.AcceptOpen)
+        self.load_dialog.setNameFilters(["Images (*.png *.jpg)"])
+        self.load_dialog.setDirectory(Qt.QDir.currentPath())
+        # self.load_dialog.setOption(QFileDialog.DontUseNativeDialog)
+
+        self.save_dialog = QFileDialog()
+        self.save_dialog.setFilter(self.save_dialog.filter())
+        self.save_dialog.setDefaultSuffix('stl')
+        self.save_dialog.setAcceptMode(QFileDialog.AcceptSave)
+        self.save_dialog.setNameFilters(['STL (*.stl)'])
+        self.save_dialog.setDirectory(Qt.QDir.currentPath())
+        # self.save_dialog.setOption(QFileDialog.DontUseNativeDialog)
 
         # Load default config
         self.config = Config()
@@ -52,24 +69,36 @@ class MainWindow(QMainWindow):
         # self.plotter.view_xy()
 
     def open_file(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open Image",
-                                                   QtCore.QDir.currentPath(),
-                                                   "Images (*.png *.jpg)")
-        # file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
-        if file_name:
-            # Qt Graphics
-            self.ui.lineImagePath.setText(file_name)
-            self.input_scene.clear()
-            self.pixmap = QtGui.QPixmap(file_name)
-            pixmap = self.pixmap
-            pixmap = pixmap.scaled(self.ui.graphicsViewInput.size(),
-                                   QtCore.Qt.KeepAspectRatio)
-            self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
-            self.ui.graphicsViewInput.setScene(self.input_scene)
+        """
+        Dialog for open file
+        """
+        # file_name, _ = QFileDialog.getOpenFileName(
+        #     self, caption="Open Image",
+        #     directory=QtCore.QDir.currentPath(),
+        #     filter="Images (*.png *.jpg)")
 
-            self.image2d = ImageMap(file_name)
+        if self.load_dialog.exec_() == QDialog.Accepted:
+            file_name = self.load_dialog.selectedFiles()[0]
+            print(file_name)
+
+            # file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
+            if file_name:
+                # Qt Graphics
+                self.ui.lineImagePath.setText(file_name)
+                self.input_scene.clear()
+                self.pixmap = QtGui.QPixmap(file_name)
+                pixmap = self.pixmap
+                pixmap = pixmap.scaled(self.ui.graphicsViewInput.size(),
+                                       QtCore.Qt.KeepAspectRatio)
+                self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
+                self.ui.graphicsViewInput.setScene(self.input_scene)
+
+                self.image2d = ImageMap(file_name)
 
     def render_file(self):
+        """
+        Get config. Convert 2D image to cloud point and make mesh
+        """
         if self.image2d is None or self.ui.lineImagePath.text() == "":
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -92,7 +121,7 @@ class MainWindow(QMainWindow):
             model = self.image2d.make_mesh(x2, y2, z2)
             t3 = time.time()
 
-            model.save(filename="temp.stl", mode=Mode.BINARY)
+            model.save(filename="temp.stl", mode=Mode.ASCII)
             sphere = pv.read("temp.stl")
             self.plotter.clear()
             sphere["Elevation"] = model.vectors[:, :, 2][:, 1].ravel(order="F")
@@ -105,8 +134,12 @@ class MainWindow(QMainWindow):
                   "\nTotal time: \t%s" % (t2 - t1, t3 - t2, t4 - t3, t4 - t1))
 
     def get_ui_config(self):
+        """
+        Get config from UI and cast to class Config
+        """
         shape_index = self.ui.shapeComboBox.currentIndex()
         use_border = True if self.ui.borderYesRadioButton.isChecked() else False
+        stl_format = "Binary" if self.ui.binaryRadioButton.isChecked() else "ASCII"
 
         current_config = Config(
             shape=self.ui.shapeComboBox.currentData(shape_index),
@@ -115,11 +148,15 @@ class MainWindow(QMainWindow):
             max_thick=self.ui.maxThickDoubleSpinBox.value(),
             curve=self.ui.curveSpinBox.value(),
             use_border=use_border,
-            border_thick=self.ui.borderThickSlider.value()
+            border_thick=self.ui.borderThickSlider.value(),
+            format=stl_format
         )
         return current_config
 
     def update_config_by_shape(self):
+        """
+        Set default config when shape changed.
+        """
         shape = self.ui.shapeComboBox.currentText()
         if shape == 'Heart':
             self.ui.curveSpinBox.setValue(360)
@@ -129,6 +166,9 @@ class MainWindow(QMainWindow):
             self.ui.curveSpinBox.setValue(360)
 
     def update_input_size(self, event):
+        """
+        Update size of Graphics View of input when windows resized.
+        """
         if self.pixmap is not None:
             pixmap = self.pixmap
             pixmap = pixmap.scaled(self.ui.graphicsViewInput.size(),
@@ -137,6 +177,14 @@ class MainWindow(QMainWindow):
             self.input_scene.clear()
             self.input_scene.setSceneRect(self.ui.graphicsViewInput.sceneRect())
             self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
+
+    def download_file(self):
+        """
+        Dialog to save file
+        """
+        if self.save_dialog.exec_() == QDialog.Accepted:
+            file_name = self.save_dialog.selectedFiles()[0]
+            print(file_name)
 
 
 if __name__ == "__main__":

@@ -15,15 +15,17 @@ class ImageMap:
     def process_image(self):
         return 1
 
-    # TODO: 1. Load image with opencv
-
-    # TODO: 2. Scale image
     @staticmethod
     def scale_image(image, width_mm=400):
         """Scale image to 0.1 pixel width
 
+        Example: im_scaled = scale_image(image, width_mm = 1000)
+
         Will make an image with 1000 pixels wide.
         The height will be scale proportionally
+        :param image: input image
+        :param width_mm: expected width
+        :return: resized image
         """
         height = image.shape[0]
         width = image.shape[1]
@@ -32,23 +34,33 @@ class ImageMap:
         output = cv2.resize(image, new_size, interpolation=cv2.INTER_CUBIC)
         return output
 
-    # TODO: 3. Convert to gray
     @staticmethod
     def rgb_to_gray(image):
         """
         Convert rgb image to grayscale image in range 0-1
+        :param image: original image
+        :return: gray image
         """
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return gray
 
-    # TODO: 4. Flip image (optional)
+    @property
     def flip_image(self):
+        """
+        Flip image
+        """
         if self.flip:
             self.image = cv2.flip(self.image, 1)
         return self
 
-    # TODO: 5. Convert2D image to CloudPoint
     def image2points(self, width='', max_thickness=3.0, min_thickness=0.5):
+        """
+        Convert image to point clouds
+        :param width: Expected width
+        :param max_thickness: maximum thickness
+        :param min_thickness: minimum thickness
+        :return: Coordinate in 3 dimension x, y, z
+        """
         depth = max_thickness
         offset = min_thickness
 
@@ -97,7 +109,13 @@ class ImageMap:
 
     @staticmethod
     def make_mesh(x, y, z):
-        """ Convert point cloud grid to mesh """
+        """
+         Convert point cloud grid to mesh
+        :param x: Array of x coordinate
+        :param y: Array of y coordinate
+        :param z: Array of z coordinate
+        :return: mesh.Mesh()
+        """
         count = 0
         width = z.shape[0] - 1
         height = z.shape[1] - 1
@@ -139,6 +157,15 @@ class ImageMap:
 
     @staticmethod
     def make_shape(x, y, z, curve, shape):
+        """
+
+        :param x: Array of x coordinate
+        :param y: Array of y coordinate
+        :param z: Array of z coordinate
+        :param curve: Curve in degree (0-360)
+        :param shape: Expected shape (Cylinder, Curve, Heart)
+        :return: Shape coordinate in xyz coordinate
+        """
         newx = x.copy()
         newz = z.copy()
 
