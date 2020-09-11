@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QButtonGroup
 
 from resources.ui.UserWidgets import QDoubleSlider
 
@@ -65,11 +66,26 @@ class UiMainWindow(object):
         self.buttonOutputLayout.addWidget(self.renderButton, 0, 1, 1, 1)
         self.downloadButton = QtWidgets.QPushButton(self.centralwidget)
         self.downloadButton.setObjectName("downloadButton")
-        self.buttonOutputLayout.addWidget(self.downloadButton, 0, 3, 1, 1)
+        self.buttonOutputLayout.addWidget(self.downloadButton, 0, 5, 1, 1)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20,
                                             QtWidgets.QSizePolicy.Expanding,
                                             QtWidgets.QSizePolicy.Minimum)
-        self.buttonOutputLayout.addItem(spacerItem2, 0, 4, 1, 1)
+        self.buttonOutputLayout.addItem(spacerItem2, 0, 6, 1, 1)
+        self.showColordButton = QtWidgets.QPushButton(self.centralwidget)
+        self.showColordButton.setObjectName("showColordButton")
+        self.buttonOutputLayout.addWidget(self.showColordButton, 0, 3, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20,
+                                            QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
+        self.buttonOutputLayout.addItem(spacerItem3, 0, 4, 1, 1)
+        self.buttonOutputLayout.addWidget(self.downloadButton, 0, 5, 1, 1)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.buttonOutputLayout.addItem(spacerItem2, 0, 6, 1, 1)
+        self.showColordButton = QtWidgets.QPushButton(self.centralwidget)
+        self.showColordButton.setObjectName("showColordButton")
+        self.buttonOutputLayout.addWidget(self.showColordButton, 0, 3, 1, 1)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.buttonOutputLayout.addItem(spacerItem3, 0, 4, 1, 1)
         self.outputLayout.addLayout(self.buttonOutputLayout)
         # self.graphicsViewOutput = QtWidgets.QGraphicsView(self.centralwidget)
         # self.graphicsViewOutput.setObjectName("graphicsViewOutput")
@@ -107,10 +123,6 @@ class UiMainWindow(object):
         self.curveSlider.setMaximum(360)
         self.curveSlider.setProperty("value", 0)
         self.gridLayout.addWidget(self.curveSlider, 2, 5, 1, 1)
-        self.otherSetting3Slider = QtWidgets.QSlider(self.centralwidget)
-        self.otherSetting3Slider.setOrientation(QtCore.Qt.Horizontal)
-        self.otherSetting3Slider.setObjectName("otherSetting3Slider")
-        self.gridLayout.addWidget(self.otherSetting3Slider, 3, 5, 1, 1)
         self.minThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
         self.minThickDoubleSpinBox.setDecimals(1)
@@ -129,6 +141,7 @@ class UiMainWindow(object):
         self.curveSpinBox.setMaximum(360)
         self.curveSpinBox.setProperty("value", 0)
         self.gridLayout.addWidget(self.curveSpinBox, 2, 6, 1, 1)
+
         self.borderHorizontalLayout = QtWidgets.QHBoxLayout()
         self.borderHorizontalLayout.setObjectName("borderHorizontalLayout")
         self.borderYesRadioButton = QtWidgets.QRadioButton(self.centralwidget)
@@ -139,9 +152,24 @@ class UiMainWindow(object):
         self.borderNoRadioButton.setObjectName("borderNoRadioButton")
         self.borderHorizontalLayout.addWidget(self.borderNoRadioButton)
         self.gridLayout.addLayout(self.borderHorizontalLayout, 0, 5, 1, 2)
-        self.otherSetting3SpinBox = QtWidgets.QSpinBox(self.centralwidget)
-        self.otherSetting3SpinBox.setObjectName("otherSetting3SpinBox")
-        self.gridLayout.addWidget(self.otherSetting3SpinBox, 3, 6, 1, 1)
+        self.borderButtonGroup = QButtonGroup()
+        self.borderButtonGroup.addButton(self.borderYesRadioButton)
+        self.borderButtonGroup.addButton(self.borderNoRadioButton)
+
+        self.formatHorizontalLayout = QtWidgets.QHBoxLayout()
+        self.formatHorizontalLayout.setObjectName("formatHorizontalLayout")
+        self.binaryFormatRadioButton = QtWidgets.QRadioButton(self.centralwidget)
+        self.binaryFormatRadioButton.setChecked(True)
+        self.binaryFormatRadioButton.setObjectName("binaryFormatRadioButton")
+        self.formatHorizontalLayout.addWidget(self.binaryFormatRadioButton)
+        self.asciiFormatRadioButton = QtWidgets.QRadioButton(self.centralwidget)
+        self.asciiFormatRadioButton.setObjectName("asciiFormatRadioButton")
+        self.formatHorizontalLayout.addWidget(self.asciiFormatRadioButton)
+        self.gridLayout.addLayout(self.formatHorizontalLayout, 3, 5, 1, 2)
+        self.formatButtonGroup = QButtonGroup()
+        self.formatButtonGroup.addButton(self.binaryFormatRadioButton)
+        self.formatButtonGroup.addButton(self.asciiFormatRadioButton)
+
         self.lblMinThick = QtWidgets.QLabel(self.centralwidget)
         self.lblMinThick.setObjectName("lblMinThick")
         self.gridLayout.addWidget(self.lblMinThick, 2, 0, 1, 1)
@@ -154,19 +182,20 @@ class UiMainWindow(object):
         self.lblBorder = QtWidgets.QLabel(self.centralwidget)
         self.lblBorder.setObjectName("lblBorder")
         self.gridLayout.addWidget(self.lblBorder, 0, 4, 1, 1)
+
         self.shapeComboBox = QtWidgets.QComboBox(self.centralwidget)
         self.shapeComboBox.setEditable(False)
         self.shapeComboBox.setObjectName("shapeComboBox")
         self.gridLayout.addWidget(self.shapeComboBox, 0, 1, 1, 2)
-        self.borderThickSlider = QDoubleSlider()
-        self.borderThickSlider.setEnabled(False)
-        self.borderThickSlider.setMinInt(0)
-        self.borderThickSlider.setMaxInt(100)
-        self.borderThickSlider.setMinimum(0)
-        self.borderThickSlider.setMaximum(10.0)
-        self.borderThickSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.borderThickSlider.setObjectName("borderThickSlider")
-        self.gridLayout.addWidget(self.borderThickSlider, 1, 5, 1, 1)
+        self.borderThicknessSlider = QDoubleSlider()
+        self.borderThicknessSlider.setEnabled(False)
+        self.borderThicknessSlider.setMinInt(0)
+        self.borderThicknessSlider.setMaxInt(100)
+        self.borderThicknessSlider.setMinimum(0)
+        self.borderThicknessSlider.setMaximum(50.0)
+        self.borderThicknessSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.borderThicknessSlider.setObjectName("borderThicknessSlider")
+        self.gridLayout.addWidget(self.borderThicknessSlider, 1, 5, 1, 1)
         self.sizeSlider = QtWidgets.QSlider(self.centralwidget)
         self.sizeSlider.setMinimum(1)
         self.sizeSlider.setMaximum(500)
@@ -190,6 +219,9 @@ class UiMainWindow(object):
         self.lblCurve = QtWidgets.QLabel(self.centralwidget)
         self.lblCurve.setObjectName("lblCurve")
         self.gridLayout.addWidget(self.lblCurve, 2, 4, 1, 1)
+        self.lblFormat = QtWidgets.QLabel(self.centralwidget)
+        self.lblFormat.setObjectName("STL Format")
+        self.gridLayout.addWidget(self.lblFormat, 3, 4, 1, 1)
         self.lblOtherSetting3 = QtWidgets.QLabel(self.centralwidget)
         self.lblOtherSetting3.setObjectName("lblOtherSetting3")
         self.gridLayout.addWidget(self.lblOtherSetting3, 3, 4, 1, 1)
@@ -214,16 +246,16 @@ class UiMainWindow(object):
         self.minThickSlider.setOrientation(QtCore.Qt.Horizontal)
         self.minThickSlider.setObjectName("minThickSlider")
         self.gridLayout.addWidget(self.minThickSlider, 2, 1, 1, 1)
-        self.borderThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
+        self.borderThicknessDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
-        self.borderThickDoubleSpinBox.setEnabled(False)
-        self.borderThickDoubleSpinBox.setDecimals(1)
-        self.borderThickDoubleSpinBox.setMinimum(0.0)
-        self.borderThickDoubleSpinBox.setMaximum(10.0)
-        self.borderThickDoubleSpinBox.setSingleStep(0.1)
-        self.borderThickDoubleSpinBox.setObjectName(
-            "borderThickDoubleSpinBox")
-        self.gridLayout.addWidget(self.borderThickDoubleSpinBox, 1, 6, 1, 1)
+        self.borderThicknessDoubleSpinBox.setEnabled(False)
+        self.borderThicknessDoubleSpinBox.setDecimals(1)
+        self.borderThicknessDoubleSpinBox.setMinimum(0.0)
+        self.borderThicknessDoubleSpinBox.setMaximum(50.0)
+        self.borderThicknessDoubleSpinBox.setSingleStep(0.1)
+        self.borderThicknessDoubleSpinBox.setObjectName(
+            "borderThicknessDoubleSpinBox")
+        self.gridLayout.addWidget(self.borderThicknessDoubleSpinBox, 1, 6, 1, 1)
         self.maxThickDoubleSpinBox = QtWidgets.QDoubleSpinBox(
             self.centralwidget)
         self.maxThickDoubleSpinBox.setDecimals(1)
@@ -306,46 +338,76 @@ class UiMainWindow(object):
         self.sizeSpinBox.valueChanged['int'].connect(self.sizeSlider.setValue)
         self.curveSlider.valueChanged['int'].connect(self.curveSpinBox.setValue)
         self.curveSpinBox.valueChanged['int'].connect(self.curveSlider.setValue)
-        self.otherSetting3SpinBox.valueChanged['int'].connect(
-            self.otherSetting3Slider.setValue)
-        self.otherSetting3Slider.valueChanged['int'].connect(
-            self.otherSetting3SpinBox.setValue)
+
         self.borderYesRadioButton.clicked['bool'].connect(
-            self.borderThickSlider.setEnabled)
+            self.borderThicknessSlider.setEnabled)
         self.borderYesRadioButton.clicked['bool'].connect(
-            self.borderThickDoubleSpinBox.setEnabled)
+            self.borderThicknessDoubleSpinBox.setEnabled)
         self.borderNoRadioButton.clicked['bool'].connect(
-            self.borderThickSlider.setDisabled)
+            self.borderThicknessSlider.setDisabled)
         self.borderNoRadioButton.clicked['bool'].connect(
-            self.borderThickDoubleSpinBox.setDisabled)
+            self.borderThicknessDoubleSpinBox.setDisabled)
+
+
+
         self.maxThickDoubleSpinBox.valueChanged['double'].connect(
             self.maxThickSlider.setValue)
         self.minThickDoubleSpinBox.valueChanged['double'].connect(
             self.minThickSlider.setValue)
-        self.borderThickDoubleSpinBox.valueChanged['double'].connect(
-            self.borderThickSlider.setValue)
+        self.borderThicknessDoubleSpinBox.valueChanged['double'].connect(
+            self.borderThicknessSlider.setValue)
         self.maxThickSlider.valueChanged.connect(self.handleMaxThickSlider)
         self.minThickSlider.valueChanged.connect(self.handleMinThickSlider)
-        self.borderThickSlider.valueChanged.connect(self.handleBorderThickSlider)
+        self.borderThicknessSlider.valueChanged.connect(self.handleBorderThickSlider)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.selectImageButton, self.lineImagePath)
+        MainWindow.setTabOrder(self.lineImagePath, self.graphicsViewInput)
+        MainWindow.setTabOrder(self.graphicsViewInput, self.shapeComboBox)
+        MainWindow.setTabOrder(self.shapeComboBox, self.sizeSlider)
+        MainWindow.setTabOrder(self.sizeSlider, self.sizeSpinBox)
+        MainWindow.setTabOrder(self.sizeSpinBox, self.minThickSlider)
+        MainWindow.setTabOrder(self.minThickSlider, self.minThickDoubleSpinBox)
+        MainWindow.setTabOrder(self.minThickDoubleSpinBox, self.maxThickSlider)
+        MainWindow.setTabOrder(self.maxThickSlider, self.maxThickDoubleSpinBox)
+        MainWindow.setTabOrder(self.maxThickDoubleSpinBox,
+                               self.borderYesRadioButton)
+        MainWindow.setTabOrder(self.borderYesRadioButton,
+                               self.borderNoRadioButton)
+        MainWindow.setTabOrder(self.borderNoRadioButton,
+                               self.borderThicknessSlider)
+        MainWindow.setTabOrder(self.borderThicknessSlider,
+                               self.borderThicknessDoubleSpinBox)
+        MainWindow.setTabOrder(self.borderThicknessDoubleSpinBox,
+                               self.curveSlider)
+        MainWindow.setTabOrder(self.curveSlider, self.curveSpinBox)
+        MainWindow.setTabOrder(self.curveSpinBox, self.binaryFormatRadioButton)
+        MainWindow.setTabOrder(self.binaryFormatRadioButton,
+                               self.asciiFormatRadioButton)
+        MainWindow.setTabOrder(self.asciiFormatRadioButton, self.renderButton)
+        MainWindow.setTabOrder(self.renderButton, self.downloadButton)
+        MainWindow.setTabOrder(self.downloadButton, self.showColordButton)
+        MainWindow.setTabOrder(self.showColordButton, self.selectImageButton)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "3D Lithophanes"))
         self.selectImageButton.setText(_translate("MainWindow", "Select Image"))
         self.renderButton.setText(_translate("MainWindow", "Render"))
+        self.showColordButton.setText(_translate("MainWindow", "Show Color"))
         self.downloadButton.setText(_translate("MainWindow", "Download"))
         self.lblBorderThickness.setText(
             _translate("MainWindow", "Border Thickness"))
         self.borderYesRadioButton.setText(_translate("MainWindow", "Yes"))
         self.borderNoRadioButton.setText(_translate("MainWindow", "No"))
+        self.binaryFormatRadioButton.setText(_translate("MainWindow", "Binary"))
+        self.asciiFormatRadioButton.setText(_translate("MainWindow", "ASCII"))
         self.lblMinThick.setText(_translate("MainWindow", "Min Thickness"))
         self.lblShape.setText(_translate("MainWindow", "Shape"))
         self.lblSize.setText(_translate("MainWindow", "Size"))
         self.lblBorder.setText(_translate("MainWindow", "Border"))
         self.lblMaxThick.setText(_translate("MainWindow", "Max Thicknes"))
         self.lblCurve.setText(_translate("MainWindow", "Curve"))
-        self.lblOtherSetting3.setText(_translate("MainWindow", "Other Setting"))
+        self.lblFormat.setText(_translate("MainWindow", "STL Format"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings"))
         self.menuDownload_Settings.setTitle(
@@ -401,14 +463,14 @@ class UiMainWindow(object):
         self.minThickDoubleSpinBox.blockSignals(False)
 
     def handleBorderThickSlider(self, val):
-        self.borderThickDoubleSpinBox.blockSignals(True)
+        self.borderThicknessDoubleSpinBox.blockSignals(True)
         new_val = self.fit(val,
-                           self.borderThickSlider.getMinInt(),
-                           self.borderThickSlider.getMaxInt(),
-                           self.borderThickSlider.minimum(),
-                           self.borderThickSlider.maximum())
-        self.borderThickDoubleSpinBox.setValue(new_val)
-        self.borderThickDoubleSpinBox.blockSignals(False)
+                           self.borderThicknessSlider.getMinInt(),
+                           self.borderThicknessSlider.getMaxInt(),
+                           self.borderThicknessSlider.minimum(),
+                           self.borderThicknessSlider.maximum())
+        self.borderThicknessDoubleSpinBox.setValue(new_val)
+        self.borderThicknessDoubleSpinBox.blockSignals(False)
 
 if __name__ == "__main__":
     import sys
