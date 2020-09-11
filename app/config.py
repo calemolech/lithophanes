@@ -1,4 +1,4 @@
-import constants as const
+import app.constants as const
 
 
 class Config:
