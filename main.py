@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationDisplayName("3D Lithophanes")
-    app.setWindowIcon(QtGui.QIcon('resources/images/3D-icon.png'))
+    app.setWindowIcon(QtGui.QIcon('resources/icons/3D-icon.png'))
     # app.setStyle("Fusion")
     TestMainWindow = MainWindow()
     TestMainWindow.show()
