@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
 from pyvistaqt import QtInteractor
 import sys
 from config import Config
+from constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
 from lithophane import *
 from resources.ui.main_window import *
 from stl import Mode
@@ -17,17 +18,7 @@ class MainWindow(QMainWindow):
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
         self.image2d = None
-
-        # Menubar trigger
-        self.ui.actionOpen.triggered.connect(self.open_file)
-        self.ui.actionExit.triggered.connect(app.quit)
-
-        # Button trigger
-        self.ui.shapeComboBox.currentTextChanged.connect(
-            self.update_config_by_shape)
-        self.ui.selectImageButton.clicked.connect(self.open_file)
-        self.ui.renderButton.clicked.connect(self.render_file)
-        self.ui.downloadButton.clicked.connect(self.download_file)
+        self.is_show_color = False
 
         # Init default for UI
         self.ui.shapeComboBox.addItems(["Flat", "Cylinder", "Curve", "Heart"])
@@ -39,6 +30,18 @@ class MainWindow(QMainWindow):
         self.ui.graphicsViewInput.setMinimumSize(300, 300)
         self.input_scene = QGraphicsScene(self)
         self.pixmap = None
+
+        # Init output view
+        self.frame = Qt.QFrame()
+        self.plotter = QtInteractor(self.frame)
+        self.ui.outputLayout.addWidget(self.plotter.interactor)
+        self.plotter.show_axes_all()
+        self.plotter.set_background("dimgray")
+        # self.plotter.show_grid()
+        # self.plotter.enable_zoom_style()
+        # self.plotter.view_xy()
+        self.ui.graphicsViewInput.setStyleSheet("background:dimgray;")
+
 
         # Init Dialogs
         self.load_dialog = QFileDialog()
@@ -56,17 +59,22 @@ class MainWindow(QMainWindow):
         self.save_dialog.setDirectory(Qt.QDir.currentPath())
         # self.save_dialog.setOption(QFileDialog.DontUseNativeDialog)
 
+        # Menubar trigger
+        self.ui.actionOpen.triggered.connect(self.open_file)
+        self.ui.actionExit.triggered.connect(app.quit)
+
+        # Button trigger
+        self.ui.shapeComboBox.currentTextChanged.connect(
+            self.update_config_by_shape)
+        self.ui.selectImageButton.clicked.connect(self.open_file)
+        self.ui.renderButton.clicked.connect(self.render_file)
+        self.ui.downloadButton.clicked.connect(self.download_file)
+        self.ui.showColordButton.clicked.connect(self.show_color)
+
         # Load default config
         self.config = Config()
 
-        # Init output view
-        self.frame = Qt.QFrame()
-        self.plotter = QtInteractor(self.frame)
-        self.ui.outputLayout.addWidget(self.plotter.interactor)
-        self.plotter.show_axes_all()
-        # self.plotter.show_grid()
-        # self.plotter.enable_zoom_style()
-        # self.plotter.view_xy()
+
 
     def open_file(self):
         """
@@ -79,9 +87,10 @@ class MainWindow(QMainWindow):
 
         if self.load_dialog.exec_() == QDialog.Accepted:
             file_name = self.load_dialog.selectedFiles()[0]
-            print(file_name)
+            if DEBUG_MODE:
+                print(file_name)
 
-            # file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
+            file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
             if file_name:
                 # Qt Graphics
                 self.ui.lineImagePath.setText(file_name)
@@ -93,7 +102,7 @@ class MainWindow(QMainWindow):
                 self.input_scene.addItem(QGraphicsPixmapItem(pixmap))
                 self.ui.graphicsViewInput.setScene(self.input_scene)
 
-                self.image2d = ImageMap(file_name)
+                self.image2d = Lithophane(file_name)
 
     def render_file(self):
         """
@@ -112,7 +121,9 @@ class MainWindow(QMainWindow):
             t1 = time.time()
             x, y, z = self.image2d.image2points(self.config.size,
                                                 self.config.max_thickness,
-                                                self.config.min_thickness)
+                                                self.config.min_thickness,
+                                                self.config.use_border,
+                                                self.config.border_thickness)
 
             x2, y2, z2 = self.image2d.make_shape(x, y, z, self.config.curve,
                                                  self.config.shape)
@@ -121,36 +132,46 @@ class MainWindow(QMainWindow):
             model = self.image2d.make_mesh(x2, y2, z2)
             t3 = time.time()
 
-            model.save(filename="temp.stl", mode=Mode.ASCII)
-            sphere = pv.read("temp.stl")
+            model.save(filename=DEFAULT_OUTPUT_NAME, mode=Mode.BINARY)
+            sphere = pv.read(DEFAULT_OUTPUT_NAME)
             self.plotter.clear()
-            sphere["Elevation"] = model.vectors[:, :, 2][:, 1].ravel(order="F")
+            if self.is_show_color:
+                self.ui.showColordButton.setText("Hide Color")
+                sphere["Elevation"] = model.vectors[:, :, 2][:, 1].ravel(order="F")
+            else:
+                self.ui.showColordButton.setText("Show Color")
             self.plotter.add_mesh(sphere)
             self.plotter.camera_position = [(0, 0, z.shape[1] * 3.5),
                                             sphere.center, (0, 1, 0)]
             t4 = time.time()
 
-            print("Point cloud: \t%s \nMake mesh:  \t%s \nSave Load:  \t%s "
-                  "\nTotal time: \t%s" % (t2 - t1, t3 - t2, t4 - t3, t4 - t1))
+            if DEBUG_MODE:
+                print("Point cloud: \t%s \nMake mesh:  \t%s \nSave Load:  \t%s "
+                      "\nTotal time: \t%s" % (t2 - t1, t3 - t2, t4 - t3, t4 - t1))
 
     def get_ui_config(self):
         """
         Get config from UI and cast to class Config
         """
-        shape_index = self.ui.shapeComboBox.currentIndex()
         use_border = True if self.ui.borderYesRadioButton.isChecked() else False
-        stl_format = "Binary" if self.ui.binaryRadioButton.isChecked() else "ASCII"
+        stl_format = "Binary" if self.ui.binaryFormatRadioButton.isChecked() else "ASCII"
 
         current_config = Config(
-            shape=self.ui.shapeComboBox.currentData(shape_index),
+            shape=self.ui.shapeComboBox.currentText(),
             size=self.ui.sizeSlider.value(),
             min_thick=self.ui.minThickDoubleSpinBox.value(),
             max_thick=self.ui.maxThickDoubleSpinBox.value(),
             curve=self.ui.curveSpinBox.value(),
             use_border=use_border,
-            border_thick=self.ui.borderThickSlider.value(),
-            format=stl_format
+            border_thick=self.ui.borderThicknessSlider.value(),
+            stl_format=stl_format
         )
+
+        if DEBUG_MODE:
+            attrs = vars(current_config)
+            for (k, v) in attrs.items():
+                print(k, v)
+
         return current_config
 
     def update_config_by_shape(self):
@@ -184,12 +205,19 @@ class MainWindow(QMainWindow):
         """
         if self.save_dialog.exec_() == QDialog.Accepted:
             file_name = self.save_dialog.selectedFiles()[0]
-            print(file_name)
+
+    def show_color(self):
+        """
+        Dialog to save file
+        """
+        self.is_show_color = not self.is_show_color
+        self.render_file()
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationDisplayName("3D Lithophanes")
+    app.setWindowIcon(QtGui.QIcon('resources/images/3D-icon.png'))
     # app.setStyle("Fusion")
     TestMainWindow = MainWindow()
     TestMainWindow.show()

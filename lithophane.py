@@ -3,9 +3,10 @@ import numpy as np
 from stl import mesh
 
 
-class ImageMap:
+class Lithophane:
     def __init__(self, image_path, positive=True, mirror=False, flip=False):
         self.image = cv2.imread(image_path)
+        self.processed_image = None
         self.gray = None
         self.positive = positive
         self.mirror = mirror
@@ -44,18 +45,33 @@ class ImageMap:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return gray
 
-    @property
-    def flip_image(self):
+    @staticmethod
+    def flip_image(image):
         """
         Flip image
         """
-        if self.flip:
-            self.image = cv2.flip(self.image, 1)
-        return self
+        return cv2.flip(image, 1)
 
-    def image2points(self, width='', max_thickness=3.0, min_thickness=0.5):
+    @staticmethod
+    def add_border(image, border_thickness):
+        border_thickness = int(border_thickness)
+        border_image = cv2.copyMakeBorder(
+             image,
+             border_thickness,
+             border_thickness,
+             border_thickness,
+             border_thickness,
+             cv2.BORDER_CONSTANT,
+             value=[0, 0, 0]
+          )
+        return border_image
+
+    def image2points(self, width='', max_thickness=3.0, min_thickness=0.5,
+                     use_border=False, border_thickness=0):
         """
         Convert image to point clouds
+        :param border_thickness:
+        :param use_border:
         :param width: Expected width
         :param max_thickness: maximum thickness
         :param min_thickness: minimum thickness
@@ -65,16 +81,19 @@ class ImageMap:
         offset = min_thickness
 
         if width == '':
-            width = self.image.shape[1]
+            width = self.processed_image.shape[1]
 
         # TODO: Width is actually height
-        self.image = self.scale_image(self.image, width_mm=width)
+        self.processed_image = self.scale_image(self.image, width_mm=width)
+
+        if use_border and border_thickness > 0:
+            self.processed_image = self.add_border(self.processed_image, border_thickness)
 
         # Convert to grayscale
-        if len(self.image.shape) == 3:
-            self.gray = self.rgb_to_gray(self.image)
+        if len(self.processed_image.shape) == 3:
+            self.gray = self.rgb_to_gray(self.processed_image)
         else:
-            self.gray = self.image
+            self.gray = self.processed_image
 
         self.gray = self.gray / 255.0
 
@@ -181,35 +200,23 @@ class ImageMap:
         if curve == 0:
             return x, y, z
         if curve != 0:
-            deg2Rad = (np.pi / 180)
+            deg_2_rad = (np.pi / 180)
             angle = abs(curve)
             arc_radius = (width / curve) * (180 / np.pi)
             y_arc_radius = (height / curve) * (180 / np.pi)
             distance_from_flat = np.sin(angle * (360 / np.pi)) * arc_radius
-            if (angle >= 180):
+            if angle >= 180:
                 distance_from_flat = 0
             start_angle = (0 - angle / 2)
 
-            if (curve < 0):
+            if curve < 0:
                 distance_from_flat = 0 - distance_from_flat
 
         for i in range(0, height):
             for j in range(0, width):
-                jpos = j
-                ipos = i
-
-                # if j == 1:
-                #     jpos -= 1
-                # elif j == (width - 1):
-                #     jpos += 1
-                # if i == 1:
-                #     ipos -= 1
-                # elif i == (height - 1):
-                #     ipos += 1
-
                 degrees_rotated = start_angle + (
-                        jpos / (width - overlap_offset) * angle)
-                rotation = degrees_rotated * deg2Rad
+                        j / (width - overlap_offset) * angle)
+                rotation = degrees_rotated * deg_2_rad
                 magnitude = arc_radius + z[i, j]
 
                 # Cylinder, Curve
@@ -228,8 +235,3 @@ class ImageMap:
                         3 * rotation) - np.cos(4 * rotation)) / 16)
 
         return newz, y.copy(), newx
-
-
-class Lithophane:
-    def __index__(self):
-        self.thickness = 1
