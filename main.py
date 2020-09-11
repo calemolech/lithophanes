@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
     QMessageBox, QFileDialog, QDialog
 from pyvistaqt import QtInteractor
 import sys
-from config import Config
-from constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
-from lithophane import *
+from app.config import Config
+from app.constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
+from app.lithophane import *
 from resources.ui.main_window import *
 from stl import Mode
 import time
@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationDisplayName("3D Lithophanes")
-    app.setWindowIcon(QtGui.QIcon('resources/images/3D-icon.png'))
+    app.setWindowIcon(QtGui.QIcon('resources/icons/3D-icon.png'))
     # app.setStyle("Fusion")
     TestMainWindow = MainWindow()
     TestMainWindow.show()
