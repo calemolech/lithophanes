@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
     QMessageBox, QFileDialog, QDialog
 from pyvistaqt import QtInteractor
 import sys
-from config import Config
-from constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
-from lithophane import *
+from app.config import Config
+from app.constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
+from app.lithophane import *
 from resources.ui.main_window import *
 from stl import Mode
 import time
