@@ -87,8 +87,9 @@ class LithophaneApp(QMainWindow):
             file_name = self.load_dialog.selectedFiles()[0]
             if DEBUG_MODE:
                 print(file_name)
+                file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code" \
+                            "/lithophanes/tests/test_images/a.jpg"
 
-            file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code/lithophanes/a.jpg"
             if file_name:
                 # Qt Graphics
                 self.ui.lineImagePath.setText(file_name)
