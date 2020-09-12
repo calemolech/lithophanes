@@ -71,9 +71,9 @@ class UiMainWindow(object):
                                             QtWidgets.QSizePolicy.Expanding,
                                             QtWidgets.QSizePolicy.Minimum)
         self.buttonOutputLayout.addItem(spacerItem2, 0, 6, 1, 1)
-        self.showColordButton = QtWidgets.QPushButton(self.centralwidget)
-        self.showColordButton.setObjectName("showColordButton")
-        self.buttonOutputLayout.addWidget(self.showColordButton, 0, 3, 1, 1)
+        self.showColorButton = QtWidgets.QPushButton(self.centralwidget)
+        self.showColorButton.setObjectName("showColordButton")
+        self.buttonOutputLayout.addWidget(self.showColorButton, 0, 3, 1, 1)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20,
                                             QtWidgets.QSizePolicy.Expanding,
                                             QtWidgets.QSizePolicy.Minimum)
@@ -81,9 +81,9 @@ class UiMainWindow(object):
         self.buttonOutputLayout.addWidget(self.downloadButton, 0, 5, 1, 1)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.buttonOutputLayout.addItem(spacerItem2, 0, 6, 1, 1)
-        self.showColordButton = QtWidgets.QPushButton(self.centralwidget)
-        self.showColordButton.setObjectName("showColordButton")
-        self.buttonOutputLayout.addWidget(self.showColordButton, 0, 3, 1, 1)
+        self.showColorButton = QtWidgets.QPushButton(self.centralwidget)
+        self.showColorButton.setObjectName("showColordButton")
+        self.buttonOutputLayout.addWidget(self.showColorButton, 0, 3, 1, 1)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.buttonOutputLayout.addItem(spacerItem3, 0, 4, 1, 1)
         self.outputLayout.addLayout(self.buttonOutputLayout)
@@ -309,10 +309,6 @@ class UiMainWindow(object):
         self.actionModels_Setting.setObjectName("actionModels_Setting")
         self.actionImage_Settings = QtWidgets.QAction(MainWindow)
         self.actionImage_Settings.setObjectName("actionImage_Settings")
-        self.actionBinary_STL_2 = QtWidgets.QAction(MainWindow)
-        self.actionBinary_STL_2.setObjectName("actionBinary_STL_2")
-        self.actionASCII_STL_2 = QtWidgets.QAction(MainWindow)
-        self.actionASCII_STL_2.setObjectName("actionASCII_STL_2")
         self.actionAbout = QtWidgets.QAction(MainWindow)
         self.actionAbout.setObjectName("actionAbout")
         self.menuFile.addAction(self.actionNew)
@@ -322,8 +318,6 @@ class UiMainWindow(object):
         self.menuFile.addAction(self.actionSave_As)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
-        self.menuDownload_Settings.addAction(self.actionBinary_STL_2)
-        self.menuDownload_Settings.addAction(self.actionASCII_STL_2)
         self.menuSettings.addAction(self.actionModels_Setting)
         self.menuSettings.addAction(self.actionImage_Settings)
         self.menuSettings.addAction(self.menuDownload_Settings.menuAction())
@@ -385,15 +379,15 @@ class UiMainWindow(object):
                                self.asciiFormatRadioButton)
         MainWindow.setTabOrder(self.asciiFormatRadioButton, self.renderButton)
         MainWindow.setTabOrder(self.renderButton, self.downloadButton)
-        MainWindow.setTabOrder(self.downloadButton, self.showColordButton)
-        MainWindow.setTabOrder(self.showColordButton, self.selectImageButton)
+        MainWindow.setTabOrder(self.downloadButton, self.showColorButton)
+        MainWindow.setTabOrder(self.showColorButton, self.selectImageButton)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "3D Lithophanes"))
         self.selectImageButton.setText(_translate("MainWindow", "Select Image"))
         self.renderButton.setText(_translate("MainWindow", "Render"))
-        self.showColordButton.setText(_translate("MainWindow", "Show Color"))
+        self.showColorButton.setText(_translate("MainWindow", "Show Color"))
         self.downloadButton.setText(_translate("MainWindow", "Download"))
         self.lblBorderThickness.setText(
             _translate("MainWindow", "Border Thickness"))
@@ -405,7 +399,7 @@ class UiMainWindow(object):
         self.lblShape.setText(_translate("MainWindow", "Shape"))
         self.lblSize.setText(_translate("MainWindow", "Size"))
         self.lblBorder.setText(_translate("MainWindow", "Border"))
-        self.lblMaxThick.setText(_translate("MainWindow", "Max Thicknes"))
+        self.lblMaxThick.setText(_translate("MainWindow", "Max Thickness"))
         self.lblCurve.setText(_translate("MainWindow", "Curve"))
         self.lblFormat.setText(_translate("MainWindow", "STL Format"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
@@ -430,8 +424,8 @@ class UiMainWindow(object):
             _translate("MainWindow", "Models Settings"))
         self.actionImage_Settings.setText(
             _translate("MainWindow", "Image Settings"))
-        self.actionBinary_STL_2.setText(_translate("MainWindow", "Binary STL"))
-        self.actionASCII_STL_2.setText(_translate("MainWindow", "ASCII STL"))
+        # self.actionBinary_STL_2.setText(_translate("MainWindow", "Binary STL"))
+        # self.actionASCII_STL_2.setText(_translate("MainWindow", "ASCII STL"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
 
     def fit(self, val, old_min, old_max, new_min, new_max):
