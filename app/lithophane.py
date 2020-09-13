@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from stl import mesh
+from app.constants import DEBUG_MODE
 
 
 class Lithophane:
@@ -12,12 +13,7 @@ class Lithophane:
         self.mirror = mirror
         self.flip = flip
 
-    @staticmethod
-    def process_image(self):
-        return 1
-
-    @staticmethod
-    def scale_image(image, width_mm=400):
+    def scale_image(self, image, width_mm=400):
         """Scale image to 0.1 pixel width
 
         Example: im_scaled = scale_image(image, width_mm = 1000)
@@ -28,6 +24,10 @@ class Lithophane:
         :param width_mm: expected width
         :return: resized image
         """
+        if DEBUG_MODE:
+            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
+            print(image)
+            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
         height = image.shape[0]
         width = image.shape[1]
         scale = (width_mm / width)
@@ -35,8 +35,7 @@ class Lithophane:
         output = cv2.resize(image, new_size, interpolation=cv2.INTER_CUBIC)
         return output
 
-    @staticmethod
-    def rgb_to_gray(image):
+    def rgb_to_gray(self, image):
         """
         Convert rgb image to grayscale image in range 0-1
         :param image: original image
@@ -45,15 +44,13 @@ class Lithophane:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return gray
 
-    @staticmethod
-    def flip_image(image):
+    def flip_image(self, image):
         """
         Flip image
         """
         return cv2.flip(image, 1)
 
-    @staticmethod
-    def add_border(image, border_thickness):
+    def add_border(self, image, border_thickness):
         border_thickness = int(border_thickness)
         border_image = cv2.copyMakeBorder(
              image,
@@ -81,7 +78,7 @@ class Lithophane:
         offset = min_thickness
 
         if width == '':
-            width = self.processed_image.shape[1]
+            width = self.image.shape[1]
 
         # TODO: Width is actually height
         self.processed_image = self.scale_image(self.image, width_mm=width)
@@ -126,8 +123,7 @@ class Lithophane:
         y = np.flipud(y)
         return x, y, z
 
-    @staticmethod
-    def make_mesh(x, y, z):
+    def make_mesh(self, x, y, z):
         """
          Convert point cloud grid to mesh
         :param x: Array of x coordinate
@@ -174,10 +170,9 @@ class Lithophane:
             count += 2
         return model
 
-    @staticmethod
-    def make_shape(x, y, z, curve, shape):
+    def make_shape(self, x, y, z, curve, shape):
         """
-
+        Convert from flat to other shape (Cylinder, Curve, Heart)
         :param x: Array of x coordinate
         :param y: Array of y coordinate
         :param z: Array of z coordinate

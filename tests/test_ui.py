@@ -6,17 +6,17 @@ from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication
 from colour_runner.runner import ColourTextTestRunner
 
-from app.lithophane_app import LithophaneApp
+from app.ui_app import UIApp
 
 app = QApplication(sys.argv)
 
 
-class Test_UI(unittest.TestCase):
+class TestUi(unittest.TestCase):
     """Test the GUI"""
 
     def setUp(self):
         """Create the GUI"""
-        self.form = LithophaneApp()
+        self.form = UIApp()
 
     # region Test init
     def test_init_ui(self):
@@ -186,7 +186,5 @@ class Test_UI(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # unittest.TextTestRunner(verbosity=2)
-
-    suite = unittest.TestLoader().loadTestsFromTestCase(Test_UI)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestUi)
     ColourTextTestRunner(verbosity=2).run(suite)
