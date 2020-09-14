@@ -1,5 +1,7 @@
 import unittest
-from colour_runner.runner import ColourTextTestRunner
+
+import HtmlTestRunner
+
 from app.config import Config
 from app.constants import *
 
@@ -38,4 +40,13 @@ class TestConfig(unittest.TestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestConfig)
-    ColourTextTestRunner(verbosity=2).run(suite)
+    # ColourTextTestRunner(verbosity=2).run(suite)
+
+    # HTML Report
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(
+        verbosity=2,
+        combine_reports=True,
+        output="test_results",
+        report_title="Report Unittest Config",
+        report_name="Report_Unittest_Config",
+        add_timestamp=False))

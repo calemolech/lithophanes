@@ -1,17 +1,23 @@
+import os
 import unittest
 import sys
 
+import HtmlTestRunner
 from PyQt5.QtCore import Qt
 from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication
-from colour_runner.runner import ColourTextTestRunner
 
 from app.ui_app import UIApp
+from config import Config
+from lithophane import Lithophane
 
 app = QApplication(sys.argv)
 
 
 class TestUi(unittest.TestCase):
+    curPath = os.path.abspath(os.path.dirname(__file__))
+    rootPath = os.path.split(curPath)[0]
+    sys.path.append(rootPath)
     """Test the GUI"""
 
     def setUp(self):
@@ -65,7 +71,7 @@ class TestUi(unittest.TestCase):
     def test_shape_change(self):
         """Test change shape comboBox"""
         shape_combo_box = self.form.ui.shapeComboBox
-        QTest.keyClick(shape_combo_box,Qt.Key_PageUp)
+        QTest.keyClick(shape_combo_box, Qt.Key_PageUp)
         all_items = [self.form.ui.shapeComboBox.itemText(i)
                      for i in range(self.form.ui.shapeComboBox.count())]
         for i in range(shape_combo_box.count() - 2):
@@ -182,9 +188,82 @@ class TestUi(unittest.TestCase):
         self.form.ui.asciiFormatRadioButton.setChecked(True)
         self.assertEqual(False,
                          self.form.ui.binaryFormatRadioButton.isChecked())
+
+    # endregion
+
+    # region Test UI App
+    def test_get_ui_config(self):
+        actual_config = self.form.get_ui_config()
+        expected_config = Config()
+        self.assertEqual(expected_config.size, actual_config.size)
+        self.assertEqual(expected_config.max_thickness,
+                         actual_config.max_thickness)
+        self.assertEqual(expected_config.min_thickness,
+                         actual_config.min_thickness)
+        self.assertEqual(expected_config.use_border, actual_config.use_border)
+        self.assertEqual(expected_config.border_thickness,
+                         actual_config.border_thickness)
+        self.assertEqual(expected_config.curve, actual_config.curve)
+        self.assertEqual(expected_config.format, actual_config.format)
+
+    def test_update_config_by_shape_flat(self):
+        self.form.ui.shapeComboBox.setCurrentIndex(0)
+        self.form.update_config_by_shape()
+        self.assertEqual(False, self.form.ui.curveSpinBox.isEnabled())
+
+    def test_update_config_by_shape_cylinder(self):
+        self.form.ui.shapeComboBox.setCurrentIndex(1)
+        self.form.update_config_by_shape()
+        self.assertEqual(360, self.form.ui.curveSpinBox.value())
+        self.assertEqual(False, self.form.ui.curveSpinBox.isEnabled())
+
+    def test_update_config_by_shape_curve(self):
+        self.form.ui.shapeComboBox.setCurrentIndex(2)
+        self.form.update_config_by_shape()
+        self.assertEqual(True, self.form.ui.curveSpinBox.isEnabled())
+
+    def test_update_config_by_shape_heart(self):
+        self.form.ui.shapeComboBox.setCurrentIndex(3)
+        self.form.update_config_by_shape()
+        self.assertEqual(360, self.form.ui.curveSpinBox.value())
+        self.assertEqual(False, self.form.ui.curveSpinBox.isEnabled())
+
+    def test_full_screen(self):
+        self.form.hide()
+        self.assertEqual(False, self.form.isFullScreen())
+        self.form.full_screen()
+        self.form.close()
+        self.assertEqual(True, self.form.isFullScreen())
+
+    def test_show_normal(self):
+        self.form.hide()
+        self.form.show_normal()
+        self.form.close()
+        self.assertEqual(False, self.form.isFullScreen())
+
+    def test_select_image(self):
+        file_name = "test_images/a.jpg"
+        self.form.image2d = Lithophane(file_name)
+        self.assertNotEqual(None, self.form.image2d)
+
+    def test_render(self):
+        file_name = "test_images/a.jpg"
+        self.form.ui.lineImagePath.setText(file_name)
+        self.form.image2d = Lithophane(file_name)
+        self.form.render_file()
+        self.assertNotEqual(None, self.form.model)
     # endregion
 
 
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestUi)
-    ColourTextTestRunner(verbosity=2).run(suite)
+    # suite = unittest.TestLoader().loadTestsFromTestCase(TestUi)
+    # ColourTextTestRunner(verbosity=2).run(suite)
+
+    # HTML Report
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(
+        verbosity=2,
+        combine_reports=True,
+        output="test_results",
+        report_title="Report Unittest UI",
+        report_name="Report_Unittest_UI",
+        add_timestamp=False))
