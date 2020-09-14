@@ -492,6 +492,16 @@
     <property name="title">
      <string>View</string>
     </property>
+    <widget class="QMenu" name="menuThemes">
+     <property name="title">
+      <string>Themes</string>
+     </property>
+     <addaction name="actionOSX"/>
+     <addaction name="actionWindows"/>
+     <addaction name="actionUbuntu_Fusion"/>
+    </widget>
+    <addaction name="menuThemes"/>
+    <addaction name="actionEnter_Full_Screen"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -574,6 +584,26 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionOSX">
+   <property name="text">
+    <string>OSX</string>
+   </property>
+  </action>
+  <action name="actionWindows">
+   <property name="text">
+    <string>Windows</string>
+   </property>
+  </action>
+  <action name="actionUbuntu_Fusion">
+   <property name="text">
+    <string>Ubuntu(Fusion)</string>
+   </property>
+  </action>
+  <action name="actionEnter_Full_Screen">
+   <property name="text">
+    <string>Enter Full Screen</string>
    </property>
   </action>
  </widget>

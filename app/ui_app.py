@@ -1,7 +1,8 @@
 import pyvista as pv
 from PyQt5 import Qt, QtGui
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
-    QMessageBox, QFileDialog, QDialog
+    QMessageBox, QFileDialog, QDialog, QStyle
 from pyvistaqt import QtInteractor
 from app.config import Config
 from app.constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
@@ -18,6 +19,7 @@ class UIApp(QMainWindow):
         self.image2d = None
         self.is_show_color = False
         self.model = None
+        self.is_full_screen = False
 
         # Init default for UI
         self.ui.shapeComboBox.addItems(["Flat", "Cylinder", "Curve", "Heart"])
@@ -60,8 +62,16 @@ class UIApp(QMainWindow):
         # self.save_dialog.setOption(QFileDialog.DontUseNativeDialog)
 
         # Menubar trigger
+        self.ui.actionNew.triggered.connect(self.open_file)
         self.ui.actionOpen.triggered.connect(self.open_file)
+        self.ui.actionSave.triggered.connect(self.download_file)
+        self.ui.actionSave_As.triggered.connect(self.download_file)
         self.ui.actionExit.triggered.connect(self.close)
+        self.ui.actionEnter_Full_Screen.triggered.connect(self.full_screen)
+        self.ui.actionMaximize.triggered.connect(self.showMaximized)
+        self.ui.actionMinimize.triggered.connect(self.showMinimized)
+        self.ui.actionShowNormal.triggered.connect(self.showNormal)
+        self.ui.actionAbout.triggered.connect(self.about)
 
         # Button trigger
         self.ui.shapeComboBox.currentTextChanged.connect(
@@ -212,8 +222,8 @@ class UIApp(QMainWindow):
             return
         if self.save_dialog.exec_() == QDialog.Accepted:
             out_file_name = self.save_dialog.selectedFiles()[0]
-            self.model.save(filename=out_file_name,  mode=Mode.BINARY if
-                self.config.format == "Binary" else Mode.ASCII)
+            self.model.save(filename=out_file_name, mode=Mode.BINARY if
+            self.ui.binaryFormatRadioButton.isChecked() else Mode.ASCII)
 
     def show_color(self):
         """
@@ -221,3 +231,39 @@ class UIApp(QMainWindow):
         """
         self.is_show_color = not self.is_show_color
         self.render_file()
+
+    def full_screen(self):
+        if self.is_full_screen:
+            self.showNormal()
+            self.ui.actionEnter_Full_Screen.setText("Enter Full Screen")
+        else:
+            self.showFullScreen()
+            self.ui.actionEnter_Full_Screen.setText("Exit Full Screen")
+        self.is_full_screen = not self.is_full_screen
+
+    def about(self):
+        msg = QMessageBox()
+        msg.setIconPixmap(QPixmap(":/resources/icons/3D-icon.png"))
+        msg.setText("<html><head/><body> <h1>3D Lithophanes</h1>"
+                    "<p>Version 1.0.0 </p></body>")
+        msg.setInformativeText("<html><head/><body>"
+                               "<p>3D Lithophanes is an application for "
+                               "transforming a digital photograph into a "
+                               "lithophane 3D model that can be printed.</p> "
+                               "<p>Authors:<p>"
+                               "<ul>"
+                               "<li>Tran Thanh Huy</li>"
+                               "<li>Phan Thanh Dat</li>"
+                               "<li>Dang Thanh Minh</li>"
+                               "</ul>"
+                               "<p>Supervisors:<p>"
+                               "<ul>"
+                               "<li>Prof. Pascal Desbarats</li>"
+                               "<li>Prof. Fabien Baldacci</li>"
+                               "</ul>"
+                               "<p>Copyright (C) 2020</p>")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.setWindowTitle("3D Lithophanes")
+        msg.setWindowFlag(QtCore.Qt.Drawer)
+        retval = msg.exec_()
+        return
