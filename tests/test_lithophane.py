@@ -2,9 +2,10 @@ import os
 import sys
 import unittest
 import copy
+
+import HtmlTestRunner
 import cv2
 import numpy as np
-from colour_runner.runner import ColourTextTestRunner
 from app.lithophane import Lithophane
 
 
@@ -19,7 +20,6 @@ class TestLithophane(unittest.TestCase):
         """Init class with default image"""
         test_image_path = "test_images/a.jpg"
         self.litho = Lithophane(test_image_path)
-        self.test_scale_image(self(methodName='test_scale_image'))
 
     def test_scale_image(self):
         """Test scale image"""
@@ -68,18 +68,16 @@ class TestLithophane(unittest.TestCase):
         np.testing.assert_array_equal(actual[1].shape, expected_shape)
         np.testing.assert_array_equal(actual[2].shape, expected_shape)
 
-    def test_make_mesh(self):
-        """Test make mesh"""
-        # Skip because Function is timeout
-        # Skip because very difficult to check input and output of this function
-        pass
-
-    def test_make_shape(self):
-        """Test make shape"""
-        # Skip because very difficult to check input and output of this function
-        pass
-
 
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestLithophane)
-    ColourTextTestRunner(verbosity=2).run(suite)
+    # suite = unittest.TestLoader().loadTestsFromTestCase(TestLithophane)
+    # ColourTextTestRunner(verbosity=2).run(suite)
+
+    # HTML Report
+    unittest.main(testRunner=HtmlTestRunner.HTMLTestRunner(
+        verbosity=2,
+        combine_reports=True,
+        output="test_results",
+        report_title="Report Unittest Lithophane",
+        report_name="Report_Unittest_Lithophane",
+        add_timestamp=False))

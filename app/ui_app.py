@@ -1,14 +1,15 @@
 import pyvista as pv
 from PyQt5 import Qt, QtGui
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsPixmapItem, \
-    QMessageBox, QFileDialog, QDialog, QStyle
+    QMessageBox, QFileDialog, QDialog
 from pyvistaqt import QtInteractor
+from stl import Mode
+
 from app.config import Config
 from app.constants import DEFAULT_OUTPUT_NAME, DEBUG_MODE
 from app.lithophane import *
 from resources.ui.main_window import *
-from stl import Mode
 
 
 class UIApp(QMainWindow):
@@ -70,7 +71,7 @@ class UIApp(QMainWindow):
         self.ui.actionEnter_Full_Screen.triggered.connect(self.full_screen)
         self.ui.actionMaximize.triggered.connect(self.showMaximized)
         self.ui.actionMinimize.triggered.connect(self.showMinimized)
-        self.ui.actionShowNormal.triggered.connect(self.showNormal)
+        self.ui.actionShowNormal.triggered.connect(self.show_normal)
         self.ui.actionAbout.triggered.connect(self.about)
 
         # Button trigger
@@ -92,8 +93,8 @@ class UIApp(QMainWindow):
             file_name = self.load_dialog.selectedFiles()[0]
             if DEBUG_MODE:
                 print(file_name)
-                file_name = "/Users/cale/Desktop/M1-IEI/Project/04_Code" \
-                            "/lithophanes/tests/test_images/a.jpg"
+                file_name = "/Users/cale/Desktop/M1-IEI/Project/lithophanes" \
+                            "/tests/test_images/a.jpg"
 
             if file_name:
                 # Qt Graphics
@@ -240,6 +241,11 @@ class UIApp(QMainWindow):
             self.showFullScreen()
             self.ui.actionEnter_Full_Screen.setText("Exit Full Screen")
         self.is_full_screen = not self.is_full_screen
+
+    def show_normal(self):
+        self.showNormal()
+        self.is_full_screen = False
+        self.ui.actionEnter_Full_Screen.setText("Enter Full Screen")
 
     def about(self):
         msg = QMessageBox()

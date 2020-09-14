@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from stl import mesh
-from app.constants import DEBUG_MODE
 
 
 class Lithophane:
@@ -24,10 +23,7 @@ class Lithophane:
         :param width_mm: expected width
         :return: resized image
         """
-        if DEBUG_MODE:
-            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
-            print(image)
-            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
+
         height = image.shape[0]
         width = image.shape[1]
         scale = (width_mm / width)
@@ -93,16 +89,6 @@ class Lithophane:
             self.gray = self.processed_image
 
         self.gray = self.gray / 255.0
-
-        # g = np.fliplr(g)
-        # if (show):
-        #     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-        #     cv2.imshow('image', self.gray)
-        #     cv2.waitKey(0)
-        #     cv2.destroyAllWindows()
-
-        # print(np.max(g))
-        # print(g.shape)
 
         # Invert threshold for z matrix
         ngray = 1 - np.double(self.gray)
