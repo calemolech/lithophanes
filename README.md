@@ -33,6 +33,19 @@ python main.py
 ```
 - Run application by executable file in "/dist/main"
 
+## Build Application
+- The easiest method to build application is use command with pre-defines spec:
+```bash
+#Mac OS/Linux
+pyinstaller --onefile 3D\ Lithophanes.spec
+```
+- You also build from scratch by command:
+```bash
+#Mac OS/Linux
+pyinstaller --onefile --additional-hooks-dir=hooks --name="3D Lithophane" --noconsole --icon="./resources/icons/app.icns" --runtime-tmpdir="/tmp main.py
+```
+- The result we appear in `dist` folder.
+
 ## Team members
 - Tran Thanh Huy - huytran190194@gmail.com
 - Phan Thanh Dat - phanthanhdat203@gmail.com

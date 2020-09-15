@@ -136,8 +136,18 @@ class UIApp(QMainWindow):
             model = self.image2d.make_mesh(x2, y2, z2)
             self.model = model
 
-            model.save(filename=DEFAULT_OUTPUT_NAME, mode=Mode.BINARY)
-            sphere = pv.read(DEFAULT_OUTPUT_NAME)
+            import sys
+            from pathlib import Path
+
+            if getattr(sys, 'frozen', False):
+                folder = Path(sys._MEIPASS)
+            else:
+                folder = Path(__file__).parent
+
+            file_name = folder / DEFAULT_OUTPUT_NAME
+
+            model.save(filename=file_name, mode=Mode.BINARY)
+            sphere = pv.read(file_name)
             self.plotter.clear()
             if self.is_show_color:
                 self.ui.showColorButton.setText("Hide Color")

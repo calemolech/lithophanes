@@ -1,4 +1,4 @@
-DEFAULT_OUTPUT_NAME = './output/temp.stl'
+DEFAULT_OUTPUT_NAME = 'temp_output.stl'
 DEBUG_MODE = False
 
 DEFAULT_CONFIG_SHAPE = 'Flat'
