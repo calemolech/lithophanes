@@ -12,7 +12,7 @@ meshio==4.2.0
 numpy==1.19.1
 numpy-stl==2.11.2
 opencv-python-headless==4.4.0.42
-Pillow==7.2.0
+Pillow==9.0.1
 protobuf==3.13.0
 pyinstaller==4.0
 pyinstaller-hooks-contrib==2020.7
